@@ -21,6 +21,7 @@ gcc
 gdbm
 gdrive
 gh
+ghostty
 git
 go
 graphviz
@@ -68,7 +69,6 @@ z
 alfred
 bruno
 caffeine
-doubletwist
 dropbox
 flux
 jordanbaird-ice
