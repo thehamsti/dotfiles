@@ -1,0 +1,150 @@
+# Homebrew Bundle - https://github.com/Homebrew/homebrew-bundle
+# Run with: brew bundle --file=~/dotfiles/macos/Brewfile
+
+# Taps
+tap "homebrew/bundle"
+tap "jesseduffield/lazygit"
+tap "localstack/tap"
+tap "oven-sh/bun"
+tap "sst/tap"
+tap "stripe/stripe-cli"
+tap "supabase/tap"
+tap "ubuntu/microk8s"
+
+# =============================================================================
+# CLI Tools
+# =============================================================================
+
+# Core utilities
+brew "git"
+brew "wget"
+brew "jq"
+brew "yq"
+brew "ripgrep"
+brew "fd"                    # Better find
+brew "eza"                   # Better ls (successor to exa)
+brew "bat"                   # Better cat
+brew "tree"                  # Directory listing
+brew "fzf"                   # Fuzzy finder
+brew "z"                     # Directory jumping
+brew "zoxide"                # Smarter cd
+
+# Git tools
+brew "gh"                    # GitHub CLI
+brew "jesseduffield/lazygit/lazygit"
+brew "diff-so-fancy"
+brew "delta"                 # Better git diff viewer
+
+# System monitoring
+brew "btop"
+brew "htop"
+brew "speedtest-cli"
+brew "fping"
+
+# Development - Languages & Runtimes
+brew "fnm"                   # Fast Node Manager
+brew "oven-sh/bun/bun"
+brew "deno"
+brew "go"
+brew "uv"                    # Python package manager
+brew "ruff"                  # Python linter
+brew "pipx"
+brew "dotnet"
+brew "dotnet@8"
+brew "gcc"
+brew "cmake"
+brew "llvm@17"
+brew "protobuf"
+brew "scala"
+brew "sbt"
+
+# Development - Tools
+brew "neovim"
+brew "helix"
+brew "tmux"
+brew "ranger"
+brew "act"                   # Run GitHub Actions locally
+brew "watchman"
+
+# Cloud & Infrastructure
+brew "aws-elasticbeanstalk"
+brew "aws-sam-cli"
+brew "doctl"                 # DigitalOcean CLI
+brew "sst/tap/sst"
+brew "localstack/tap/localstack-cli"
+brew "stripe/stripe-cli/stripe"
+brew "supabase/tap/supabase"
+brew "ubuntu/microk8s/microk8s"
+
+# Database
+brew "postgresql@15"
+
+# Ruby
+brew "rbenv-default-gems"
+brew "rbenv-gemset"
+
+# iOS Development
+brew "cocoapods"
+
+# Media & Files
+brew "ffmpeg"
+brew "sox"
+brew "graphviz"
+brew "gdrive"
+
+# AI/ML
+brew "ollama"
+brew "livekit"
+brew "portaudio"
+
+# Package managers
+brew "pnpm"
+brew "yarn"
+
+# Misc CLI
+brew "fastfetch"             # System info (replaces neofetch)
+brew "1password-cli"
+
+# Libraries (dependencies)
+brew "gdbm"
+brew "libev"
+brew "mvfst"
+brew "openssl@1.1"
+
+# =============================================================================
+# Desktop Applications (Casks)
+# =============================================================================
+
+# Terminals & Editors
+cask "ghostty"
+cask "wezterm"
+cask "zed"
+cask "sublime-text"
+
+# Development
+cask "docker"
+brew "docker-compose"
+cask "orbstack"              # Docker alternative
+cask "bruno"                 # API client
+cask "multipass"             # Ubuntu VMs
+
+# Productivity
+cask "alfred"
+cask "rectangle"             # Window management
+cask "jordanbaird-ice"       # Menu bar management
+cask "caffeine"              # Prevent sleep
+cask "dropbox"
+cask "nextcloud"
+
+# Utilities
+cask "stats"                 # System stats in menu bar
+cask "flux"                  # Night shift
+cask "superduper"            # Backup
+
+# Media
+cask "vlc"
+cask "transmission"
+
+# Academic
+cask "mactex"
+cask "zotero"

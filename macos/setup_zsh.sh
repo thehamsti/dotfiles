@@ -1,8 +1,99 @@
-#!/bin/sh
+#!/bin/bash
+set -euo pipefail
 
-## Install ohmyzsh
-sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+# Install Oh My Zsh if not already installed
+if [ ! -d "$HOME/.oh-my-zsh" ]; then
+    echo "Installing Oh My Zsh..."
+    sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
+else
+    echo "Oh My Zsh is already installed"
+fi
 
-## Setup .zshrc by sourcing aliases.sh in it
+# Install ZSH plugins
+ZSH_CUSTOM="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}"
+
+# zsh-autosuggestions
+if [ ! -d "$ZSH_CUSTOM/plugins/zsh-autosuggestions" ]; then
+    echo "Installing zsh-autosuggestions..."
+    git clone https://github.com/zsh-users/zsh-autosuggestions "$ZSH_CUSTOM/plugins/zsh-autosuggestions"
+else
+    echo "zsh-autosuggestions already installed"
+fi
+
+# zsh-syntax-highlighting
+if [ ! -d "$ZSH_CUSTOM/plugins/zsh-syntax-highlighting" ]; then
+    echo "Installing zsh-syntax-highlighting..."
+    git clone https://github.com/zsh-users/zsh-syntax-highlighting "$ZSH_CUSTOM/plugins/zsh-syntax-highlighting"
+else
+    echo "zsh-syntax-highlighting already installed"
+fi
+
+# zsh-completions
+if [ ! -d "$ZSH_CUSTOM/plugins/zsh-completions" ]; then
+    echo "Installing zsh-completions..."
+    git clone https://github.com/zsh-users/zsh-completions "$ZSH_CUSTOM/plugins/zsh-completions"
+else
+    echo "zsh-completions already installed"
+fi
+
+# Source aliases in .zshrc
 ALIASES_LINE="source ~/dotfiles/macos/aliases.sh"
-grep -qxF "$ALIASES_LINE" ~/.zshrc || echo "$ALIASES_LINE" >>~/.zshrc
+if ! grep -qxF "$ALIASES_LINE" ~/.zshrc 2>/dev/null; then
+    {
+        echo ""
+        echo "# Dotfiles aliases"
+        echo "$ALIASES_LINE"
+    } >> ~/.zshrc
+    echo "Added aliases.sh to .zshrc"
+else
+    echo "aliases.sh already sourced in .zshrc"
+fi
+
+# Add plugins to .zshrc if not already configured
+if grep -q "^plugins=(" ~/.zshrc; then
+    if ! grep -q "zsh-autosuggestions" ~/.zshrc; then
+        echo ""
+        echo "NOTE: Add these plugins to your .zshrc plugins=(...) line:"
+        echo "  plugins=(git zsh-autosuggestions zsh-syntax-highlighting zsh-completions)"
+    fi
+fi
+
+# Setup zoxide (smarter cd) if installed
+if command -v zoxide &>/dev/null; then
+    if ! grep -qF "zoxide init" ~/.zshrc 2>/dev/null; then
+        {
+            echo ""
+            echo "# Zoxide - smarter cd"
+            echo "eval \"\$(zoxide init zsh)\""
+        } >> ~/.zshrc
+        echo "Added zoxide to .zshrc"
+    fi
+fi
+
+# Setup fnm (Fast Node Manager) if installed
+if command -v fnm &>/dev/null; then
+    if ! grep -qF "fnm env" ~/.zshrc 2>/dev/null; then
+        {
+            echo ""
+            echo "# FNM - Fast Node Manager"
+            echo "eval \"\$(fnm env --use-on-cd)\""
+        } >> ~/.zshrc
+        echo "Added fnm to .zshrc"
+    fi
+fi
+
+# Setup fzf keybindings if installed
+if command -v fzf &>/dev/null; then
+    if ! grep -qF "fzf --zsh" ~/.zshrc 2>/dev/null; then
+        {
+            echo ""
+            echo "# FZF keybindings"
+            echo "source <(fzf --zsh)"
+        } >> ~/.zshrc
+        echo "Added fzf to .zshrc"
+    fi
+fi
+
+echo ""
+echo "ZSH setup complete!"
+echo "Remember to restart your terminal or run: source ~/.zshrc"

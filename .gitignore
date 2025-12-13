@@ -1,1 +1,11 @@
 .DS_Store
+*.swp
+*.swo
+*~
+
+# Homebrew
+Brewfile.lock.json
+
+# Neovim
+neovim/nvim/lazy-lock.json
+neovim/nvim/.luarc.json
