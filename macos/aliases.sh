@@ -123,7 +123,7 @@ alias localip="ipconfig getifaddr en0"
 alias path='echo $PATH | tr ":" "\n"'
 
 # System update
-alias update='sudo softwareupdate -i -a; brew update; brew upgrade; brew cleanup'
+alias update='sudo softwareupdate -i -a; brew update; brew upgrade; brew cleanup; bun-update-globals'
 
 # Clipboard
 alias c="tr -d '\n' | pbcopy"
