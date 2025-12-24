@@ -41,10 +41,7 @@ if command -v bat &>/dev/null; then
     alias catp="bat"  # with paging
 fi
 
-# Use fd instead of find if available
-if command -v fd &>/dev/null; then
-    alias find="fd"
-fi
+
 
 # Zoxide aliases (if using zoxide)
 if command -v zoxide &>/dev/null; then
@@ -211,4 +208,24 @@ note() {
 # Find process by name
 psg() {
     ps aux | grep -v grep | grep -i "$1"
+}
+
+# Update all globally installed bun packages to latest
+bun-update-globals() {
+    echo "Updating globally installed bun packages..."
+    local packages
+    # Parse package names: strip tree chars (├── └──), then strip version (@x.y.z)
+    packages=$(bun pm ls -g 2>/dev/null | tail -n +2 | sed 's/^[├└]── //' | sed 's/@[0-9][^@]*$//' | grep -v "^$")
+    
+    if [ -z "$packages" ]; then
+        echo "No global bun packages found."
+        return 0
+    fi
+    
+    echo "$packages" | while read -r pkg; do
+        echo "Updating $pkg..."
+        bun install --global "${pkg}@latest"
+    done
+    
+    echo "All global bun packages updated."
 }
