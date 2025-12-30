@@ -9,7 +9,7 @@ alias ..="cd .."
 alias ...="cd ../.."
 alias ....="cd ../../.."
 alias .....="cd ../../../.."
-alias '-=cd -'
+
 
 # Shortcuts
 alias dl="cd ~/Downloads"
@@ -212,20 +212,39 @@ psg() {
 
 # Update all globally installed bun packages to latest
 bun-update-globals() {
-    echo "Updating globally installed bun packages..."
-    local packages
-    # Parse package names: strip tree chars (├── └──), then strip version (@x.y.z)
-    packages=$(bun pm ls -g 2>/dev/null | tail -n +2 | sed 's/^[├└]── //' | sed 's/@[0-9][^@]*$//' | grep -v "^$")
+    echo "Checking globally installed bun packages..."
+    local pkg_list current_version latest_version upgraded=0 checked=0
     
-    if [ -z "$packages" ]; then
+    # Parse package names and versions from bun pm ls -g
+    pkg_list=$(bun pm ls -g 2>/dev/null | tail -n +2 | sed 's/^[├└]── //' | grep -v "^$")
+    
+    if [ -z "$pkg_list" ]; then
         echo "No global bun packages found."
         return 0
     fi
     
-    echo "$packages" | while read -r pkg; do
-        echo "Updating $pkg..."
-        bun install --global "${pkg}@latest"
+    echo "$pkg_list" | while read -r line; do
+        # Extract package name and current version (format: package@version)
+        local pkg_name="${line%@*}"
+        current_version="${line##*@}"
+        
+        # Get latest version from npm registry
+        latest_version=$(npm view "$pkg_name" version 2>/dev/null)
+        
+        if [ -z "$latest_version" ]; then
+            echo "  ⚠ $pkg_name: couldn't fetch latest version"
+            continue
+        fi
+        
+        if [ "$current_version" = "$latest_version" ]; then
+            # Already up to date, skip silently
+            continue
+        fi
+        
+        # Version differs, upgrade it
+        echo "  ↑ $pkg_name: $current_version → $latest_version"
+        bun install --global "${pkg_name}@latest" >/dev/null 2>&1
     done
     
-    echo "All global bun packages updated."
+    echo "Done."
 }
