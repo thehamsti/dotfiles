@@ -1,6 +1,9 @@
 #!/bin/bash
 set -euo pipefail
 
+# Ensure .zshrc exists
+touch ~/.zshrc
+
 # Install Oh My Zsh if not already installed
 if [ ! -d "$HOME/.oh-my-zsh" ]; then
     echo "Installing Oh My Zsh..."
@@ -70,15 +73,15 @@ if command -v zoxide &>/dev/null; then
     fi
 fi
 
-# Setup fnm (Fast Node Manager) if installed
-if command -v fnm &>/dev/null; then
-    if ! grep -qF "fnm env" ~/.zshrc 2>/dev/null; then
+# Setup mise (polyglot runtime manager) if installed
+if command -v mise &>/dev/null; then
+    if ! grep -qF "mise activate" ~/.zshrc 2>/dev/null; then
         {
             echo ""
-            echo "# FNM - Fast Node Manager"
-            echo "eval \"\$(fnm env --use-on-cd)\""
+            echo "# Mise - Runtime version manager"
+            echo "eval \"\$(mise activate zsh)\""
         } >> ~/.zshrc
-        echo "Added fnm to .zshrc"
+        echo "Added mise to .zshrc"
     fi
 fi
 
@@ -91,6 +94,30 @@ if command -v fzf &>/dev/null; then
             echo "source <(fzf --zsh)"
         } >> ~/.zshrc
         echo "Added fzf to .zshrc"
+    fi
+fi
+
+# Setup starship prompt if installed
+if command -v starship &>/dev/null; then
+    if ! grep -qF "starship init" ~/.zshrc 2>/dev/null; then
+        {
+            echo ""
+            echo "# Starship prompt"
+            echo "eval \"\$(starship init zsh)\""
+        } >> ~/.zshrc
+        echo "Added starship to .zshrc"
+    fi
+fi
+
+# Setup direnv if installed
+if command -v direnv &>/dev/null; then
+    if ! grep -qF "direnv hook" ~/.zshrc 2>/dev/null; then
+        {
+            echo ""
+            echo "# Direnv - auto-load env vars"
+            echo "eval \"\$(direnv hook zsh)\""
+        } >> ~/.zshrc
+        echo "Added direnv to .zshrc"
     fi
 fi
 
