@@ -46,8 +46,11 @@ fi
 # Zoxide aliases (if using zoxide)
 if command -v zoxide &>/dev/null; then
     alias cd="z"
-    alias cdi="zi"  # interactive
+    alias cdi="zi"  # interactive directory picker
 fi
+
+# Quick directory back
+alias -- -="cd -"
 
 # =============================================================================
 # Git
@@ -76,6 +79,12 @@ alias gf="git fetch"
 alias gr="git rebase"
 alias gri="git rebase -i"
 
+# Modern git commands (switch/restore)
+alias gsw="git switch"
+alias gswc="git switch -c"
+alias grs="git restore"
+alias grss="git restore --staged"
+
 # =============================================================================
 # Docker
 # =============================================================================
@@ -103,11 +112,13 @@ alias ni="npm install"
 alias br="bun run"
 alias bi="bun install"
 alias bx="bunx"
+alias bt="bun test"
+alias btw="bun test --watch"
 
-# Python
+# Python (using uv for package management)
 alias py="python3"
-alias pip="pip3"
-alias venv="python3 -m venv"
+alias pip="uv pip"
+alias venv="uv venv"
 alias activate="source .venv/bin/activate"
 
 # =============================================================================
@@ -162,8 +173,8 @@ alias weather="curl wttr.in"
 # Generate random password
 alias randpw="openssl rand -base64 32"
 
-# Disk usage
-alias duf="du -sh * | sort -hr"
+# Disk usage (dush to avoid shadowing duf tool)
+alias dush="du -sh * | sort -hr"
 
 # =============================================================================
 # Functions
@@ -213,38 +224,58 @@ psg() {
 # Update all globally installed bun packages to latest
 bun-update-globals() {
     echo "Checking globally installed bun packages..."
-    local pkg_list current_version latest_version upgraded=0 checked=0
-    
+    local pkg_list upgraded=0
+
     # Parse package names and versions from bun pm ls -g
     pkg_list=$(bun pm ls -g 2>/dev/null | tail -n +2 | sed 's/^[├└]── //' | grep -v "^$")
-    
+
     if [ -z "$pkg_list" ]; then
         echo "No global bun packages found."
         return 0
     fi
-    
-    echo "$pkg_list" | while read -r line; do
-        # Extract package name and current version (format: package@version)
+
+    # Use here-string to avoid subshell (variables persist)
+    while read -r line; do
         local pkg_name="${line%@*}"
-        current_version="${line##*@}"
-        
+        local current_version="${line##*@}"
+        local latest_version
+
         # Get latest version from npm registry
         latest_version=$(npm view "$pkg_name" version 2>/dev/null)
-        
+
         if [ -z "$latest_version" ]; then
             echo "  ⚠ $pkg_name: couldn't fetch latest version"
             continue
         fi
-        
+
         if [ "$current_version" = "$latest_version" ]; then
-            # Already up to date, skip silently
             continue
         fi
-        
-        # Version differs, upgrade it
+
         echo "  ↑ $pkg_name: $current_version → $latest_version"
         bun install --global "${pkg_name}@latest" >/dev/null 2>&1
-    done
-    
-    echo "Done."
+        ((upgraded++)) || true
+    done <<< "$pkg_list"
+
+    if [ "$upgraded" -eq 0 ]; then
+        echo "All packages up to date."
+    else
+        echo "Done. $upgraded package(s) upgraded."
+    fi
+}
+
+# Kill process on a specific port
+killport() {
+    local port=$1
+    if [ -z "$port" ]; then
+        echo "Usage: killport <port>"
+        return 1
+    fi
+    local pids=$(lsof -ti:"$port" 2>/dev/null)
+    if [ -z "$pids" ]; then
+        echo "No process found on port $port"
+    else
+        echo "$pids" | xargs kill -9
+        echo "Killed process(es) on port $port"
+    fi
 }
