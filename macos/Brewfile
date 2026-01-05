@@ -26,8 +26,7 @@ brew "eza"                   # Better ls (successor to exa)
 brew "bat"                   # Better cat
 brew "tree"                  # Directory listing
 brew "fzf"                   # Fuzzy finder
-brew "z"                     # Directory jumping
-brew "zoxide"                # Smarter cd
+brew "zoxide"                # Smarter cd (replaces z)
 
 # Git tools
 brew "gh"                    # GitHub CLI
@@ -42,7 +41,7 @@ brew "speedtest-cli"
 brew "fping"
 
 # Development - Languages & Runtimes
-brew "fnm"                   # Fast Node Manager
+brew "mise"                  # Polyglot runtime manager (node, python, etc.)
 brew "oven-sh/bun/bun"
 brew "deno"
 brew "go"
@@ -101,6 +100,10 @@ brew "portaudio"
 brew "pnpm"
 brew "yarn"
 
+# Shell enhancements
+brew "starship"              # Modern, fast prompt
+brew "direnv"                # Auto-load env vars per directory
+
 # Misc CLI
 brew "fastfetch"             # System info (replaces neofetch)
 brew "1password-cli"
@@ -109,7 +112,6 @@ brew "1password-cli"
 brew "gdbm"
 brew "libev"
 brew "mvfst"
-brew "openssl@1.1"
 
 # =============================================================================
 # Desktop Applications (Casks)
@@ -122,9 +124,7 @@ cask "zed"
 cask "sublime-text"
 
 # Development
-cask "docker"
-brew "docker-compose"
-cask "orbstack"              # Docker alternative
+cask "orbstack"              # Docker (includes docker CLI, superior to Docker Desktop)
 cask "bruno"                 # API client
 cask "multipass"             # Ubuntu VMs
 
