@@ -42,9 +42,40 @@ ln -sf "$SCRIPT_DIR/neovim/nvim" "$HOME/.config/nvim"
 echo "Neovim config symlinked to ~/.config/nvim"
 echo ""
 
+# Symlink global gitignore
+echo "Step 7: Symlinking global gitignore..."
+ln -sf "$SCRIPT_DIR/gitignore_global" "$HOME/.gitignore_global"
+echo "Global gitignore symlinked to ~/.gitignore_global"
+echo ""
+
+# Symlink starship config if it exists
+if [ -f "$SCRIPT_DIR/starship.toml" ]; then
+    echo "Step 8: Symlinking starship config..."
+    ln -sf "$SCRIPT_DIR/starship.toml" "$HOME/.config/starship.toml"
+    echo "Starship config symlinked to ~/.config/starship.toml"
+    echo ""
+fi
+
+# Setup SSH config (copy, don't symlink for security)
+echo "Step 9: Setting up SSH config..."
+mkdir -p "$HOME/.ssh"
+chmod 700 "$HOME/.ssh"
+if [ ! -f "$HOME/.ssh/config" ]; then
+    cp "$SCRIPT_DIR/ssh_config" "$HOME/.ssh/config"
+    chmod 600 "$HOME/.ssh/config"
+    echo "SSH config copied to ~/.ssh/config"
+else
+    echo "SSH config already exists, skipping (see ssh_config for template)"
+fi
+echo ""
+
 echo "=== Setup Complete ==="
 echo ""
 echo "Next steps:"
 echo "  1. Restart your terminal or run: source ~/.zshrc"
 echo "  2. Open Neovim to install plugins: nvim"
-echo "  3. Some macOS changes may require a logout/restart"
+echo "  3. Run 'mise use node@lts' to install Node.js"
+echo "  4. Customize ~/.ssh/config if needed"
+echo "  5. Some macOS changes may require a logout/restart"
+echo ""
+echo "Optional: Run ./backup.sh before making system changes"
