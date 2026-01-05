@@ -1,0 +1,70 @@
+# =============================================================================
+# SSH Config Template - Copy to ~/.ssh/config
+# =============================================================================
+
+# Global defaults
+Host *
+    # Use macOS Keychain for SSH keys
+    UseKeychain yes
+    AddKeysToAgent yes
+    IdentityFile ~/.ssh/id_ed25519
+
+    # Keep connections alive
+    ServerAliveInterval 60
+    ServerAliveCountMax 3
+
+    # Faster connections
+    Compression yes
+
+    # Security: Only use strong algorithms
+    KexAlgorithms curve25519-sha256@libssh.org,diffie-hellman-group-exchange-sha256
+    HostKeyAlgorithms ssh-ed25519-cert-v01@openssh.com,ssh-rsa-cert-v01@openssh.com,ssh-ed25519,ssh-rsa
+    Ciphers chacha20-poly1305@openssh.com,aes256-gcm@openssh.com,aes128-gcm@openssh.com
+    MACs hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com
+
+# GitHub
+Host github.com
+    HostName github.com
+    User git
+    IdentityFile ~/.ssh/id_ed25519
+
+# GitLab
+Host gitlab.com
+    HostName gitlab.com
+    User git
+    IdentityFile ~/.ssh/id_ed25519
+
+# =============================================================================
+# Example: Custom server configurations
+# =============================================================================
+
+# Example: Personal server
+# Host myserver
+#     HostName 192.168.1.100
+#     User myuser
+#     IdentityFile ~/.ssh/id_ed25519
+#     Port 22
+
+# Example: Jump host / Bastion
+# Host bastion
+#     HostName bastion.example.com
+#     User admin
+#     IdentityFile ~/.ssh/bastion_key
+
+# Example: Server behind bastion
+# Host internal
+#     HostName 10.0.0.50
+#     User admin
+#     ProxyJump bastion
+
+# Example: AWS EC2 instance
+# Host aws-web
+#     HostName ec2-xx-xxx-xxx-xx.compute-1.amazonaws.com
+#     User ec2-user
+#     IdentityFile ~/.ssh/aws-key.pem
+
+# Example: DigitalOcean droplet
+# Host do-droplet
+#     HostName xxx.xxx.xxx.xxx
+#     User root
+#     IdentityFile ~/.ssh/do_key

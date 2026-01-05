@@ -1,0 +1,110 @@
+# =============================================================================
+# Starship Prompt Configuration
+# https://starship.rs/config/
+# =============================================================================
+
+# Timeout for commands (milliseconds)
+command_timeout = 1000
+
+# Add blank line before prompt
+add_newline = true
+
+# Prompt format
+format = """
+$directory\
+$git_branch\
+$git_status\
+$nodejs\
+$python\
+$rust\
+$golang\
+$package\
+$cmd_duration\
+$line_break\
+$character"""
+
+# Right prompt (shows time)
+right_format = "$time"
+
+# Directory
+[directory]
+truncation_length = 3
+truncate_to_repo = true
+style = "bold cyan"
+
+# Git branch
+[git_branch]
+symbol = " "
+style = "bold purple"
+
+# Git status
+[git_status]
+style = "bold red"
+ahead = "⇡${count}"
+behind = "⇣${count}"
+diverged = "⇕⇡${ahead_count}⇣${behind_count}"
+conflicted = "="
+untracked = "?"
+stashed = "$"
+modified = "!"
+staged = "+"
+renamed = "»"
+deleted = "✘"
+
+# Character (prompt symbol)
+[character]
+success_symbol = "[❯](bold green)"
+error_symbol = "[❯](bold red)"
+vimcmd_symbol = "[❮](bold green)"
+
+# Command duration
+[cmd_duration]
+min_time = 2000
+format = "took [$duration]($style) "
+style = "yellow"
+
+# Node.js
+[nodejs]
+symbol = " "
+style = "bold green"
+detect_files = ["package.json", ".nvmrc", ".node-version"]
+
+# Python
+[python]
+symbol = " "
+style = "bold yellow"
+
+# Rust
+[rust]
+symbol = " "
+style = "bold red"
+
+# Go
+[golang]
+symbol = " "
+style = "bold cyan"
+
+# Package version
+[package]
+symbol = "📦 "
+style = "bold 208"
+
+# Time (right side)
+[time]
+disabled = false
+format = "[$time]($style) "
+style = "dimmed white"
+time_format = "%H:%M"
+
+# Disabled modules (for performance)
+[aws]
+disabled = true
+
+[gcloud]
+disabled = true
+
+[docker_context]
+disabled = true
+
+[kubernetes]
+disabled = true
