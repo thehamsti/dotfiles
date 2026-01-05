@@ -64,9 +64,33 @@ git config --global rerere.enabled true
 git config --global feature.manyFiles true
 git config --global core.fsmonitor true
 
+# Use global gitignore
+git config --global core.excludesfile ~/.gitignore_global
+
+# macOS credential helper
+git config --global credential.helper osxkeychain
+
+# Sort branches by most recent commit
+git config --global branch.sort -committerdate
+
+# Better merge tool (nvim)
+if command -v nvim &>/dev/null; then
+    git config --global merge.tool nvimdiff
+    git config --global mergetool.nvimdiff.cmd 'nvim -d "$LOCAL" "$REMOTE" "$MERGED" -c "wincmd w" -c "wincmd J"'
+    git config --global mergetool.prompt false
+    git config --global mergetool.keepBackup false
+fi
+
+# Expand save panel by default (for git gui tools)
+git config --global gui.displayuntracked true
+
 echo ""
 echo "Git configuration complete!"
 echo ""
 echo "Note: You may want to set your user info:"
 echo "  git config --global user.name \"Your Name\""
 echo "  git config --global user.email \"your@email.com\""
+echo ""
+echo "For GPG signing (optional):"
+echo "  git config --global commit.gpgsign true"
+echo "  git config --global user.signingkey <your-key-id>"
