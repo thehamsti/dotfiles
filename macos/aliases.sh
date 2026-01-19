@@ -43,11 +43,7 @@ fi
 
 
 
-# Zoxide aliases (if using zoxide)
-if command -v zoxide &>/dev/null; then
-    alias cd="z"
-    alias cdi="zi"  # interactive directory picker
-fi
+# Zoxide aliases are set up after zoxide init in .zshrc
 
 # Quick directory back
 alias -- -="cd -"
@@ -150,6 +146,28 @@ alias afk="/System/Library/CoreServices/Menu\ Extras/User.menu/Contents/Resource
 
 # See what's listening on ports
 alias ports='lsof -i -P -n | grep LISTEN'
+
+# =============================================================================
+# Nix / nix-darwin
+# =============================================================================
+
+# Use /run path as fallback if darwin-rebuild not in PATH yet
+_nix_rebuild() { 
+  local cmd="darwin-rebuild"
+  if ! command -v darwin-rebuild &>/dev/null; then
+    cmd="/run/current-system/sw/bin/darwin-rebuild"
+  fi
+  sudo "$cmd" "$@"
+}
+alias nrs="_nix_rebuild switch --flake ~/dotfiles/nix"    # rebuild & switch
+alias nfu="(builtin cd ~/dotfiles/nix && nix flake update)"       # update flake inputs
+alias nup="(builtin cd ~/dotfiles/nix && nix flake update) && _nix_rebuild switch --flake ~/dotfiles/nix"  # update all
+alias nrb="_nix_rebuild --rollback"                       # rollback to previous
+alias ngen="_nix_rebuild --list-generations"              # list generations
+alias ngc="nix-collect-garbage -d"                        # garbage collect
+alias nsp="nix search nixpkgs"                            # search nixpkgs
+alias npkgs='${EDITOR:-nvim} ~/dotfiles/nix/darwin/packages.nix'    # edit nix packages
+alias nbrew='${EDITOR:-nvim} ~/dotfiles/nix/darwin/homebrew.nix'    # edit homebrew config
 
 # =============================================================================
 # Config shortcuts
