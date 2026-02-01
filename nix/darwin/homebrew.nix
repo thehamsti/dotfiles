@@ -12,17 +12,19 @@
     taps = [
       "jesseduffield/lazygit"
       "localstack/tap"
-      "oven-sh/bun"
       "sst/tap"
       "stripe/stripe-cli"
       "supabase/tap"
       "ubuntu/microk8s"
+      "cloudflare/cloudflare"
+      "planetscale/tap"
     ];
 
     brews = [
       # Cloud & Infrastructure
       "aws-elasticbeanstalk"
       "aws-sam-cli"
+      "cloudflare/cloudflare/cloudflared"
       "doctl"
       "sst/tap/sst"
       "localstack/tap/localstack-cli"
@@ -31,7 +33,10 @@
       "ubuntu/microk8s/microk8s"
 
       # Database
-      "postgresql@15"
+      "postgresql@17"
+      "postgresql@18"
+      "mysql-client"
+      "planetscale/tap/pscale"
 
       # Ruby
       "rbenv-default-gems"
@@ -63,7 +68,7 @@
       "multipass"
 
       # Productivity
-      "alfred"
+      "raycast"
       "rectangle"
       "jordanbaird-ice"
       "caffeine"

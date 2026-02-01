@@ -127,7 +127,7 @@ alias localip="ipconfig getifaddr en0"
 alias path='echo $PATH | tr ":" "\n"'
 
 # System update
-alias update='sudo softwareupdate -i -a; brew update; brew upgrade; brew cleanup; bun-update-globals'
+alias update='sudo softwareupdate -i -a; nup; brew update; brew upgrade; brew cleanup; bun-update-globals'
 
 # Clipboard
 alias c="tr -d '\n' | pbcopy"
@@ -160,8 +160,8 @@ _nix_rebuild() {
   sudo "$cmd" "$@"
 }
 alias nrs="_nix_rebuild switch --flake ~/dotfiles/nix"    # rebuild & switch
-alias nfu="(builtin cd ~/dotfiles/nix && nix flake update)"       # update flake inputs
-alias nup="(builtin cd ~/dotfiles/nix && nix flake update) && _nix_rebuild switch --flake ~/dotfiles/nix"  # update all
+alias nfu="(builtin cd ~/dotfiles/nix && nix flake update 2>&1 | grep -v '\.git: Permission denied')"  # update flake inputs
+alias nup="(builtin cd ~/dotfiles/nix && nix flake update 2>&1 | grep -v '\.git: Permission denied') && _nix_rebuild switch --flake ~/dotfiles/nix"  # update all
 alias nrb="_nix_rebuild --rollback"                       # rollback to previous
 alias ngen="_nix_rebuild --list-generations"              # list generations
 alias ngc="nix-collect-garbage -d"                        # garbage collect
@@ -177,6 +177,26 @@ alias reload='source ~/.zshrc'
 alias zshrc='${EDITOR:-nvim} ~/.zshrc'
 alias aliases='${EDITOR:-nvim} ~/dotfiles/macos/aliases.sh'
 alias dotfiles='cd ~/dotfiles'
+
+# =============================================================================
+# MLX Local LLM Server
+# =============================================================================
+
+alias mlx-serve="mlx-openai-server launch \
+  --model-path mlx-community/GLM-4.7-Flash-8bit \
+  --model-type lm \
+  --context-length 65536 \
+  --port 5001 \
+  --host 0.0.0.0 \
+  --max-concurrency 2 \
+  --queue-timeout 600 \
+  --queue-size 10 \
+  --tool-call-parser glm4_moe \
+  --reasoning-parser glm4_moe \
+  --message-converter glm4_moe \
+  --enable-auto-tool-choice \
+  --log-level INFO \
+  --no-log-file"
 
 # =============================================================================
 # Misc
@@ -241,41 +261,33 @@ psg() {
 
 # Update all globally installed bun packages to latest
 bun-update-globals() {
+    # Disable trace/verbose for this function
+    setopt localoptions noxtrace noverbose 2>/dev/null
+    
     echo "Checking globally installed bun packages..."
-    local pkg_list upgraded=0
+    local pkg_list upgraded=0 pkg_name current_version latest_version
 
     # Parse package names and versions from bun pm ls -g
     pkg_list=$(bun pm ls -g 2>/dev/null | tail -n +2 | sed 's/^[├└]── //' | grep -v "^$")
 
-    if [ -z "$pkg_list" ]; then
-        echo "No global bun packages found."
+    if [[ -z "$pkg_list" ]]; then
+        echo "All packages up to date."
         return 0
     fi
 
-    # Use here-string to avoid subshell (variables persist)
     while read -r line; do
-        local pkg_name="${line%@*}"
-        local current_version="${line##*@}"
-        local latest_version
+        pkg_name="${line%@*}"
+        current_version="${line##*@}"
+        latest_version=$(npm view "$pkg_name" version 2>/dev/null) || continue
 
-        # Get latest version from npm registry
-        latest_version=$(npm view "$pkg_name" version 2>/dev/null)
-
-        if [ -z "$latest_version" ]; then
-            echo "  ⚠ $pkg_name: couldn't fetch latest version"
-            continue
-        fi
-
-        if [ "$current_version" = "$latest_version" ]; then
-            continue
-        fi
+        [[ -z "$latest_version" || "$current_version" = "$latest_version" ]] && continue
 
         echo "  ↑ $pkg_name: $current_version → $latest_version"
         bun install --global "${pkg_name}@latest" >/dev/null 2>&1
-        ((upgraded++)) || true
+        ((upgraded++))
     done <<< "$pkg_list"
 
-    if [ "$upgraded" -eq 0 ]; then
+    if (( upgraded == 0 )); then
         echo "All packages up to date."
     else
         echo "Done. $upgraded package(s) upgraded."

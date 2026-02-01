@@ -121,6 +121,26 @@ if command -v direnv &>/dev/null; then
     fi
 fi
 
+# Install Bun if not already installed
+if [ ! -d "$HOME/.bun" ]; then
+    echo "Installing Bun..."
+    curl -fsSL https://bun.sh/install | bash
+else
+    echo "Bun is already installed, upgrading..."
+    ~/.bun/bin/bun upgrade
+fi
+
+# Add Bun to PATH in .zshrc
+if ! grep -qF "BUN_INSTALL" ~/.zshrc 2>/dev/null; then
+    {
+        echo ""
+        echo "# Bun"
+        echo "export BUN_INSTALL=\"\$HOME/.bun\""
+        echo "export PATH=\"\$BUN_INSTALL/bin:\$PATH\""
+    } >> ~/.zshrc
+    echo "Added Bun to .zshrc"
+fi
+
 echo ""
 echo "ZSH setup complete!"
 echo "Remember to restart your terminal or run: source ~/.zshrc"

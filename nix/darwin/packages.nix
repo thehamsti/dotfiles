@@ -23,12 +23,16 @@
     # System monitoring
     btop
     htop
+    ncdu
     speedtest-cli
     fping
 
+    # Networking / VPN
+    wireguard-tools
+    wireguard-go
+
     # Development - Languages & Runtimes
     mise
-    bun
     deno
     go
     uv
@@ -47,6 +51,12 @@
     ranger
     act
     watchman
+
+    # Cloud
+    awscli2
+
+    # Database
+    postgresql_17
 
     # Media & Files
     ffmpeg
