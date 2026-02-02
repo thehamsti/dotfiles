@@ -159,9 +159,14 @@ _nix_rebuild() {
   fi
   sudo "$cmd" "$@"
 }
+
+_nix_quiet_git_perm() {
+  "$@" 2>&1 | grep -v '\.git: Permission denied'
+  return ${pipestatus[1]}
+}
 alias nrs="_nix_rebuild switch --flake ~/dotfiles/nix"    # rebuild & switch
-alias nfu="(builtin cd ~/dotfiles/nix && nix flake update 2>&1 | grep -v '\.git: Permission denied')"  # update flake inputs
-alias nup="(builtin cd ~/dotfiles/nix && nix flake update 2>&1 | grep -v '\.git: Permission denied') && _nix_rebuild switch --flake ~/dotfiles/nix"  # update all
+alias nfu="(builtin cd ~/dotfiles/nix && _nix_quiet_git_perm nix flake update)"  # update flake inputs
+alias nup="(builtin cd ~/dotfiles/nix && _nix_quiet_git_perm nix flake update) && _nix_quiet_git_perm _nix_rebuild switch --flake ~/dotfiles/nix"  # update all
 alias nrb="_nix_rebuild --rollback"                       # rollback to previous
 alias ngen="_nix_rebuild --list-generations"              # list generations
 alias ngc="nix-collect-garbage -d"                        # garbage collect
@@ -263,35 +268,52 @@ psg() {
 bun-update-globals() {
     # Disable trace/verbose for this function
     setopt localoptions noxtrace noverbose 2>/dev/null
-    
-    echo "Checking globally installed bun packages..."
-    local pkg_list upgraded=0 pkg_name current_version latest_version
 
-    # Parse package names and versions from bun pm ls -g
-    pkg_list=$(bun pm ls -g 2>/dev/null | tail -n +2 | sed 's/^[├└]── //' | grep -v "^$")
+    local bun_install="${BUN_INSTALL:-$HOME/.bun}"
+    local global_pkg_json="$bun_install/install/global/package.json"
+    local pkg_list
+    local -a pkg_names pkg_targets
 
-    if [[ -z "$pkg_list" ]]; then
-        echo "All packages up to date."
+    echo "Updating globally installed bun packages..."
+
+    if [[ ! -r "$global_pkg_json" ]]; then
+        echo "Bun global package list not readable: $global_pkg_json"
+        return 1
+    fi
+
+    if ! pkg_list="$(python3 - "$global_pkg_json" <<'PY'
+import json
+import sys
+
+path = sys.argv[1]
+with open(path, "r", encoding="utf-8") as f:
+    data = json.load(f)
+
+deps = data.get("dependencies") or {}
+for name in deps:
+    print(name)
+PY
+    )"; then
+        echo "Failed to parse bun global package list: $global_pkg_json"
+        return 1
+    fi
+
+    pkg_names=("${(@f)pkg_list}")
+
+    if (( ${#pkg_names[@]} == 0 )); then
+        echo "No global bun packages found."
         return 0
     fi
 
-    while read -r line; do
-        pkg_name="${line%@*}"
-        current_version="${line##*@}"
-        latest_version=$(npm view "$pkg_name" version 2>/dev/null) || continue
+    pkg_targets=("${pkg_names[@]/%/@latest}")
 
-        [[ -z "$latest_version" || "$current_version" = "$latest_version" ]] && continue
-
-        echo "  ↑ $pkg_name: $current_version → $latest_version"
-        bun install --global "${pkg_name}@latest" >/dev/null 2>&1
-        ((upgraded++))
-    done <<< "$pkg_list"
-
-    if (( upgraded == 0 )); then
-        echo "All packages up to date."
-    else
-        echo "Done. $upgraded package(s) upgraded."
+    if [[ -n "${BUN_UPDATE_GLOBALS_DRY_RUN:-}" ]]; then
+        printf "Would update %d package(s):\n" "${#pkg_targets[@]}"
+        printf "  %s\n" "${pkg_targets[@]}"
+        return 0
     fi
+
+    bun install --global "${pkg_targets[@]}"
 }
 
 # Kill process on a specific port
