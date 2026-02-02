@@ -7,94 +7,78 @@
 command_timeout = 1000
 
 # Add blank line before prompt
-add_newline = true
+add_newline = false
 
 # Prompt format
 format = """
 $directory\
 $git_branch\
 $git_status\
-$nodejs\
-$python\
-$rust\
-$golang\
-$package\
-$cmd_duration\
 $line_break\
 $character"""
 
 # Right prompt (shows time)
-right_format = "$time"
+right_format = ""
 
 # Directory
 [directory]
 truncation_length = 3
 truncate_to_repo = true
-style = "bold cyan"
+style = "cyan"
 
 # Git branch
 [git_branch]
-symbol = " "
-style = "bold purple"
+symbol = ""
+style = "purple"
 
 # Git status
 [git_status]
-style = "bold red"
-ahead = "⇡${count}"
-behind = "⇣${count}"
-diverged = "⇕⇡${ahead_count}⇣${behind_count}"
+style = "red"
+ahead = "↑${count}"
+behind = "↓${count}"
+diverged = "↕↑${ahead_count}↓${behind_count}"
 conflicted = "="
 untracked = "?"
 stashed = "$"
 modified = "!"
 staged = "+"
 renamed = "»"
-deleted = "✘"
+deleted = "x"
 
 # Character (prompt symbol)
 [character]
-success_symbol = "[❯](bold green)"
-error_symbol = "[❯](bold red)"
-vimcmd_symbol = "[❮](bold green)"
+success_symbol = "[>](green)"
+error_symbol = "[>](red)"
+vimcmd_symbol = "[<](green)"
 
 # Command duration
+# Command duration
 [cmd_duration]
-min_time = 2000
-format = "took [$duration]($style) "
-style = "yellow"
+disabled = true
 
 # Node.js
 [nodejs]
-symbol = " "
-style = "bold green"
-detect_files = ["package.json", ".nvmrc", ".node-version"]
+disabled = true
 
 # Python
 [python]
-symbol = " "
-style = "bold yellow"
+disabled = true
 
 # Rust
 [rust]
-symbol = " "
-style = "bold red"
+disabled = true
 
 # Go
 [golang]
-symbol = " "
-style = "bold cyan"
+disabled = true
 
 # Package version
 [package]
-symbol = "📦 "
-style = "bold 208"
+disabled = true
 
 # Time (right side)
 [time]
-disabled = false
-format = "[$time]($style) "
-style = "dimmed white"
-time_format = "%H:%M"
+disabled = true
 
 # Disabled modules (for performance)
 [aws]
