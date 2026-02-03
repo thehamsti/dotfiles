@@ -2,8 +2,10 @@
 -- We import this file in `lazy_setup.lua` before the `plugins/` folder.
 -- This guarantees that the specs are processed before any user plugins.
 
+local has_tree_sitter = vim.fn.executable("tree-sitter") == 1
+
 ---@type LazySpec
-return {
+local spec = {
   "AstroNvim/astrocommunity",
 
   -- Language packs
@@ -12,7 +14,6 @@ return {
   { import = "astrocommunity.pack.tailwindcss" },
   { import = "astrocommunity.pack.terraform" },
   { import = "astrocommunity.pack.python-ruff" },
-  { import = "astrocommunity.pack.swift" },
   { import = "astrocommunity.pack.zig" },
   { import = "astrocommunity.pack.yaml" },
   { import = "astrocommunity.pack.toml" },
@@ -40,3 +41,9 @@ return {
   { import = "astrocommunity.media.codesnap-nvim" },
   { import = "astrocommunity.workflow.precognition-nvim" },
 }
+
+if has_tree_sitter then
+  table.insert(spec, 8, { import = "astrocommunity.pack.swift" })
+end
+
+return spec

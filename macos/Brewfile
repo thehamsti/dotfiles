@@ -55,6 +55,7 @@ brew "sbt"
 
 # Development - Tools
 brew "neovim"
+brew "tree-sitter-cli"
 brew "helix"
 brew "tmux"
 brew "ranger"
