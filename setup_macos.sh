@@ -51,6 +51,11 @@ echo ""
 # Symlink starship config if it exists
 if [ -f "$SCRIPT_DIR/starship.toml" ]; then
     echo "Step 8: Symlinking starship config..."
+    if [ -f "$HOME/.config/starship.toml" ] && [ ! -L "$HOME/.config/starship.toml" ]; then
+        echo "Backing up existing starship config to ~/.config/starship.toml.bak"
+        mv "$HOME/.config/starship.toml" "$HOME/.config/starship.toml.bak"
+    fi
+    mkdir -p "$HOME/.config"
     ln -sf "$SCRIPT_DIR/starship.toml" "$HOME/.config/starship.toml"
     echo "Starship config symlinked to ~/.config/starship.toml"
     echo ""
