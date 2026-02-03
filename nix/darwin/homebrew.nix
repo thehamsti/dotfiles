@@ -15,7 +15,6 @@
       "sst/tap"
       "stripe/stripe-cli"
       "supabase/tap"
-      "ubuntu/microk8s"
       "cloudflare/cloudflare"
       "planetscale/tap"
     ];
@@ -30,7 +29,6 @@
       "localstack/tap/localstack-cli"
       "stripe/stripe-cli/stripe"
       "supabase/tap/supabase"
-      "ubuntu/microk8s/microk8s"
 
       # Database
       "postgresql@17"

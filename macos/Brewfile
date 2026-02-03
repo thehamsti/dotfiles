@@ -2,13 +2,11 @@
 # Run with: brew bundle --file=~/dotfiles/macos/Brewfile
 
 # Taps
-tap "homebrew/bundle"
 tap "jesseduffield/lazygit"
 tap "localstack/tap"
 tap "sst/tap"
 tap "stripe/stripe-cli"
 tap "supabase/tap"
-tap "ubuntu/microk8s"
 
 # =============================================================================
 # CLI Tools
@@ -71,7 +69,6 @@ brew "sst/tap/sst"
 brew "localstack/tap/localstack-cli"
 brew "stripe/stripe-cli/stripe"
 brew "supabase/tap/supabase"
-brew "ubuntu/microk8s/microk8s"
 
 # Database
 brew "postgresql@15"
@@ -104,7 +101,7 @@ brew "direnv"                # Auto-load env vars per directory
 
 # Misc CLI
 brew "fastfetch"             # System info (replaces neofetch)
-brew "1password-cli"
+cask "1password-cli"
 
 # Libraries (dependencies)
 brew "gdbm"
@@ -136,7 +133,7 @@ cask "nextcloud"
 
 # Utilities
 cask "stats"                 # System stats in menu bar
-cask "flux"                  # Night shift
+cask "flux-app"              # Night shift
 cask "superduper"            # Backup
 
 # Media
