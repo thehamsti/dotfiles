@@ -71,8 +71,40 @@ if [ -f "$SCRIPT_DIR/starship.toml" ]; then
     echo ""
 fi
 
+# Symlink tmux config
+if [ -f "$SCRIPT_DIR/tmux/tmux.conf" ]; then
+    echo "Step 9: Symlinking tmux config..."
+    if [ -f "$HOME/.config/tmux/tmux.conf" ] && [ ! -L "$HOME/.config/tmux/tmux.conf" ]; then
+        run_step "Backing up existing tmux config to ~/.config/tmux/tmux.conf.bak" mv "$HOME/.config/tmux/tmux.conf" "$HOME/.config/tmux/tmux.conf.bak"
+    fi
+    if [ -f "$HOME/.tmux.conf" ] && [ ! -L "$HOME/.tmux.conf" ]; then
+        run_step "Backing up existing ~/.tmux.conf to ~/.tmux.conf.bak" mv "$HOME/.tmux.conf" "$HOME/.tmux.conf.bak"
+    fi
+    run_step "Ensuring ~/.config/tmux exists" mkdir -p "$HOME/.config/tmux"
+    run_step "Symlinking tmux config to ~/.config/tmux/tmux.conf" ln -sf "$SCRIPT_DIR/tmux/tmux.conf" "$HOME/.config/tmux/tmux.conf"
+    run_step "Symlinking tmux config to ~/.tmux.conf" ln -sf "$HOME/.config/tmux/tmux.conf" "$HOME/.tmux.conf"
+    echo ""
+fi
+
+# Install TPM + tmux plugins (automated)
+if command -v tmux >/dev/null 2>&1; then
+    echo "Step 10: Installing tmux plugins..."
+    if [ ! -d "$HOME/.tmux/plugins/tpm" ]; then
+        run_step "Cloning TPM" git clone https://github.com/tmux-plugins/tpm "$HOME/.tmux/plugins/tpm"
+    fi
+    if [ -x "$HOME/.tmux/plugins/tpm/bin/install_plugins" ]; then
+        run_step "Installing tmux plugins" "$HOME/.tmux/plugins/tpm/bin/install_plugins"
+    else
+        echo "TPM install script not found, skipping plugin install"
+    fi
+    echo ""
+else
+    echo "Step 10: tmux not found, skipping plugin install"
+    echo ""
+fi
+
 # Setup SSH config (copy, don't symlink for security)
-echo "Step 9: Setting up SSH config..."
+echo "Step 11: Setting up SSH config..."
 run_step "Ensuring ~/.ssh exists" mkdir -p "$HOME/.ssh"
 run_step "Setting ~/.ssh permissions" chmod 700 "$HOME/.ssh"
 if [ ! -f "$HOME/.ssh/config" ]; then
