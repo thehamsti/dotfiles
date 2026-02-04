@@ -58,6 +58,8 @@ brew "neovim"
 brew "tree-sitter-cli"
 brew "helix"
 brew "tmux"
+brew "tmuxinator"
+brew "pam-reattach"
 brew "ranger"
 brew "act"                   # Run GitHub Actions locally
 brew "watchman"

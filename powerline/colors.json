@@ -1,0 +1,15 @@
+{
+	"colors": {
+		"ef_bg": [236, "2f383e"],
+		"ef_bg2": [238, "3c474d"],
+		"ef_bg3": [239, "475258"],
+		"ef_fg": [223, "d3c6aa"],
+		"ef_green": [150, "a7c080"],
+		"ef_blue": [109, "7fbbb3"],
+		"ef_yellow": [180, "dbbc7f"],
+		"ef_orange": [173, "e69875"],
+		"ef_red": [167, "e67e80"],
+		"ef_grey": [240, "525c62"]
+	},
+	"gradients": {}
+}

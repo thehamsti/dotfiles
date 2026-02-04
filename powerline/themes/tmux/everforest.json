@@ -1,0 +1,33 @@
+{
+	"segments": {
+		"left": [
+			{
+				"function": "powerline.segments.tmux.attached_clients",
+				"priority": 10,
+				"args": {"minimum": 2}
+			},
+			{
+				"function": "powerline.segments.common.net.hostname",
+				"priority": 20
+			}
+		],
+		"right": [
+			{
+				"function": "powerline.segments.common.sys.uptime",
+				"priority": 10
+			},
+			{
+				"function": "powerline.segments.common.sys.system_load",
+				"priority": 20
+			},
+			{
+				"function": "powerline.segments.common.time.date"
+			},
+			{
+				"function": "powerline.segments.common.time.date",
+				"name": "time",
+				"args": {"format": "%H:%M", "istime": true}
+			}
+		]
+	}
+}

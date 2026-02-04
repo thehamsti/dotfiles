@@ -1,0 +1,26 @@
+{
+	"name": "Everforest",
+	"groups": {
+		"background": {"fg": "ef_fg", "bg": "ef_bg", "attrs": []},
+		"background:divider": {"fg": "ef_grey", "bg": "ef_bg", "attrs": []},
+
+		"active_window_status": {"fg": "ef_bg", "bg": "ef_green", "attrs": ["bold"]},
+		"window_status": {"fg": "ef_fg", "bg": "ef_bg", "attrs": []},
+		"activity_status": {"fg": "ef_yellow", "bg": "ef_bg", "attrs": []},
+		"bell_status": {"fg": "ef_red", "bg": "ef_bg", "attrs": ["bold"]},
+		"window": {"fg": "ef_fg", "bg": "ef_bg", "attrs": []},
+		"window:divider": {"fg": "ef_grey", "bg": "ef_bg", "attrs": []},
+		"window:current": {"fg": "ef_bg", "bg": "ef_green", "attrs": []},
+		"window_name": {"fg": "ef_bg", "bg": "ef_green", "attrs": ["bold"]},
+		"session": {"fg": "ef_bg", "bg": "ef_blue", "attrs": ["bold"]},
+		"session:prefix": {"fg": "ef_bg", "bg": "ef_yellow", "attrs": ["bold"]},
+
+		"hostname": {"fg": "ef_bg", "bg": "ef_blue", "attrs": ["bold"]},
+		"attached_clients": {"fg": "ef_fg", "bg": "ef_bg2", "attrs": []},
+		"uptime": {"fg": "ef_fg", "bg": "ef_bg2", "attrs": []},
+		"system_load": {"fg": "ef_fg", "bg": "ef_bg2", "attrs": []},
+		"date": {"fg": "ef_fg", "bg": "ef_bg3", "attrs": []},
+		"time": {"fg": "ef_fg", "bg": "ef_bg3", "attrs": ["bold"]},
+		"time:divider": {"fg": "ef_grey", "bg": "ef_bg3", "attrs": []}
+	}
+}
