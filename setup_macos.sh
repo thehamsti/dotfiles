@@ -122,6 +122,10 @@ if [ -f "$SCRIPT_DIR/tmux/tmux.conf" ]; then
     run_step "Ensuring ~/.config/tmux exists" mkdir -p "$HOME/.config/tmux"
     run_step "Symlinking tmux config to ~/.config/tmux/tmux.conf" ln -sf "$SCRIPT_DIR/tmux/tmux.conf" "$HOME/.config/tmux/tmux.conf"
     run_step "Symlinking tmux config to ~/.tmux.conf" ln -sf "$HOME/.config/tmux/tmux.conf" "$HOME/.tmux.conf"
+    if [ -d "$SCRIPT_DIR/tmux/scripts" ]; then
+        run_step "Symlinking tmux scripts to ~/.config/tmux/scripts" ln -sfn "$SCRIPT_DIR/tmux/scripts" "$HOME/.config/tmux/scripts"
+        run_step "Ensuring tmux scripts are executable" chmod -R +x "$SCRIPT_DIR/tmux/scripts"
+    fi
     echo ""
 fi
 
