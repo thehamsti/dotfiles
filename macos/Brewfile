@@ -68,6 +68,8 @@ brew "watchman"
 brew "aws-elasticbeanstalk"
 brew "aws-sam-cli"
 brew "doctl"                 # DigitalOcean CLI
+cask "gcloud-cli"            # Google Cloud CLI (gcloud)
+brew "rclone"                # Google Drive CLI (via rclone drive backend)
 brew "sst/tap/sst"
 brew "localstack/tap/localstack-cli"
 brew "stripe/stripe-cli/stripe"
