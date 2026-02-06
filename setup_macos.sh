@@ -168,9 +168,27 @@ if command -v tmux >/dev/null 2>&1; then
     if [ ! -d "$HOME/.tmux/plugins/tpm" ]; then
         run_step "Cloning TPM" git clone https://github.com/tmux-plugins/tpm "$HOME/.tmux/plugins/tpm"
     fi
-    run_step "Configuring TPM path" tmux start-server \; set-environment -g TMUX_PLUGIN_MANAGER_PATH "$HOME/.tmux/plugins"
     if [ -x "$HOME/.tmux/plugins/tpm/bin/install_plugins" ]; then
+        # TPM's CLI installer reads TMUX_PLUGIN_MANAGER_PATH from the tmux server's
+        # environment. If we set it via `tmux set-environment` without an active
+        # session, the server can immediately exit and the variable disappears.
+        #
+        # Workaround: ensure a server stays alive via a temporary detached session
+        # (only when no server is running), set the env var, run the installer,
+        # then cleanup the temporary session.
+        TPM_INSTALL_SESSION="__tpm_install"
+        started_tmp_session=0
+        if ! tmux ls >/dev/null 2>&1; then
+            run_step "Starting temporary tmux server session" tmux new-session -d -s "$TPM_INSTALL_SESSION"
+            started_tmp_session=1
+        fi
+
+        run_step "Configuring TPM path" tmux set-environment -g TMUX_PLUGIN_MANAGER_PATH "$HOME/.tmux/plugins"
         run_step "Installing tmux plugins" "$HOME/.tmux/plugins/tpm/bin/install_plugins"
+
+        if [ "$started_tmp_session" -eq 1 ]; then
+            run_step "Cleaning up temporary tmux session" tmux kill-session -t "$TPM_INSTALL_SESSION"
+        fi
     else
         echo "TPM install script not found, skipping plugin install"
     fi

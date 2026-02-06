@@ -2,11 +2,14 @@
 # Run with: brew bundle --file=~/dotfiles/macos/Brewfile
 
 # Taps
+tap "cloudflare/cloudflare"
 tap "jesseduffield/lazygit"
 tap "localstack/tap"
+tap "planetscale/tap"
 tap "sst/tap"
 tap "stripe/stripe-cli"
 tap "supabase/tap"
+tap "ubuntu/microk8s"
 
 # =============================================================================
 # CLI Tools
@@ -67,18 +70,24 @@ brew "watchman"
 # Cloud & Infrastructure
 brew "aws-elasticbeanstalk"
 brew "aws-sam-cli"
+brew "cloudflare/cloudflare/cloudflared"
 brew "doctl"                 # DigitalOcean CLI
 cask "gcloud-cli"            # Google Cloud CLI (gcloud)
 brew "rclone"                # Google Drive CLI (via rclone drive backend)
 brew "sst/tap/sst"
 brew "localstack/tap/localstack-cli"
+brew "planetscale/tap/pscale"
 brew "stripe/stripe-cli/stripe"
 brew "supabase/tap/supabase"
+brew "ubuntu/microk8s/microk8s"
 
 # Database
-brew "postgresql@15"
+brew "mysql-client"
+brew "postgresql@17"
+brew "postgresql@18"
 
 # Ruby
+brew "rbenv"
 brew "rbenv-default-gems"
 brew "rbenv-gemset"
 
@@ -129,7 +138,7 @@ cask "bruno"                 # API client
 cask "multipass"             # Ubuntu VMs
 
 # Productivity
-cask "alfred"
+cask "raycast"
 cask "rectangle"             # Window management
 cask "jordanbaird-ice"       # Menu bar management
 cask "caffeine"              # Prevent sleep

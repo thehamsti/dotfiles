@@ -6,6 +6,23 @@ BREWFILE="$SCRIPT_DIR/Brewfile"
 
 errors=()
 
+pick_brew() {
+    local arch
+    arch="$(uname -m)"
+
+    # Prefer the correct prefix per-arch, regardless of PATH ordering.
+    if [[ "$arch" == "arm64" ]] && [[ -x "/opt/homebrew/bin/brew" ]]; then
+        echo "/opt/homebrew/bin/brew"
+        return 0
+    fi
+    if [[ "$arch" == "x86_64" ]] && [[ -x "/usr/local/bin/brew" ]]; then
+        echo "/usr/local/bin/brew"
+        return 0
+    fi
+
+    command -v brew 2>/dev/null || true
+}
+
 record_error() {
     local message="$1"
     errors+=("$message")
@@ -35,26 +52,31 @@ note_error() {
 if ! command -v brew &>/dev/null; then
     run_step "Homebrew not installed. Installing Homebrew..." \
         /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-
-    if command -v brew &>/dev/null; then
-        # Add Homebrew to PATH for Apple Silicon
-        if [[ $(uname -m) == "arm64" ]]; then
-            eval "$(/opt/homebrew/bin/brew shellenv)" || note_error "Failed to eval Homebrew shellenv"
-        fi
-    else
-        note_error "Homebrew install did not add brew to PATH"
-    fi
 else
     echo "Homebrew is already installed"
 fi
 
+BREW="$(pick_brew)"
+if [[ -z "$BREW" ]] || [[ ! -x "$BREW" ]]; then
+    note_error "Homebrew not found on PATH, and no brew binary found at /opt/homebrew/bin/brew or /usr/local/bin/brew"
+    exit 1
+fi
+
+# Ensure brew's env is available even when this script is launched from Finder / a non-login shell.
+eval "$("$BREW" shellenv)" >/dev/null 2>&1 || note_error "Failed to eval brew shellenv ($BREW)"
+
 # Update Homebrew
-run_step "Updating Homebrew..." brew update
+BREW_PREFIX="$("$BREW" --prefix 2>/dev/null || true)"
+if [[ -n "$BREW_PREFIX" ]] && [[ -d "$BREW_PREFIX/Library/.homebrew-is-managed-by-nix" ]]; then
+    echo "Homebrew is managed by nix-homebrew; skipping brew update"
+else
+    run_step "Updating Homebrew..." "$BREW" update
+fi
 
 # Install from Brewfile
 if [[ -f "$BREWFILE" ]]; then
-    run_step "Installing packages from Brewfile..." brew bundle --file="$BREWFILE"
-    run_step "Cleaning up..." brew cleanup
+    run_step "Installing packages from Brewfile..." "$BREW" bundle --file="$BREWFILE"
+    run_step "Cleaning up..." "$BREW" cleanup
 else
     note_error "Brewfile not found at $BREWFILE"
 fi
