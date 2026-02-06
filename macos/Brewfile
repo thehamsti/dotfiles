@@ -40,6 +40,10 @@ brew "htop"
 brew "speedtest-cli"
 brew "fping"
 
+# Networking / VPN
+brew "wireguard-tools"       # wg, wg-quick
+brew "wireguard-go"          # userspace WireGuard implementation (macOS compatible)
+
 # Development - Languages & Runtimes
 brew "mise"                  # Polyglot runtime manager (node, python, etc.)
 brew "deno"

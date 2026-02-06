@@ -126,6 +126,69 @@ alias ip="dig +short myip.opendns.com @resolver1.opendns.com"
 alias localip="ipconfig getifaddr en0"
 alias path='echo $PATH | tr ":" "\n"'
 
+# VPN (WireGuard)
+#
+# Defaults match the existing ~/.zshrc-style setup:
+#   vpnup -> sudo wg-quick up ~/wg0-bastion.conf
+# Override:
+#   VPN_CONF=~/foo.conf vpnup
+#   VPN_PROFILE=wg0 vpnup
+_vpn_target() {
+    local arg="${1:-}"
+    local conf="${VPN_CONF:-$HOME/wg0-bastion.conf}"
+
+    if [[ -n "$arg" ]]; then
+        echo "$arg"
+        return 0
+    fi
+
+    if [[ -f "$conf" ]]; then
+        echo "$conf"
+        return 0
+    fi
+
+    if [[ -n "${VPN_PROFILE:-}" ]]; then
+        echo "$VPN_PROFILE"
+        return 0
+    fi
+
+    echo ""
+    return 1
+}
+
+vpnup() {
+    local target
+    target="$(_vpn_target "${1:-}")" || true
+    if [[ -z "$target" ]]; then
+        echo "Usage: vpnup [wg-profile|/path/to/config.conf]"
+        echo "Defaults: VPN_CONF (or ~/wg0-bastion.conf if it exists), then VPN_PROFILE"
+        return 2
+    fi
+
+    command -v wg-quick >/dev/null 2>&1 || { echo "wg-quick not found (brew install wireguard-tools)"; return 127; }
+    sudo wg-quick up "$target"
+}
+
+vpndown() {
+    local target
+    target="$(_vpn_target "${1:-}")" || true
+    if [[ -z "$target" ]]; then
+        echo "Usage: vpndown [wg-profile|/path/to/config.conf]"
+        echo "Defaults: VPN_CONF (or ~/wg0-bastion.conf if it exists), then VPN_PROFILE"
+        return 2
+    fi
+
+    command -v wg-quick >/dev/null 2>&1 || { echo "wg-quick not found (brew install wireguard-tools)"; return 127; }
+    sudo wg-quick down "$target"
+}
+
+vpnstatus() {
+    command -v wg >/dev/null 2>&1 || { echo "wg not found (brew install wireguard-tools)"; return 127; }
+    sudo wg show
+}
+
+alias vpn="vpnstatus"
+
 # System update
 alias update='sudo softwareupdate -i -a; nup; brew update; brew upgrade; brew cleanup; bun-update-globals'
 
