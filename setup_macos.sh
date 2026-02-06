@@ -162,9 +162,19 @@ if [ -d "$SCRIPT_DIR/tmuxinator" ]; then
     echo ""
 fi
 
+# Symlink agents config (Claude Code skills)
+if [ -d "$SCRIPT_DIR/agents" ]; then
+    echo "Step 15: Symlinking agents config..."
+    if [ -e "$HOME/.agents" ] && [ ! -L "$HOME/.agents" ]; then
+        run_step "Backing up existing ~/.agents to ~/.agents.bak" mv "$HOME/.agents" "$HOME/.agents.bak"
+    fi
+    run_step "Symlinking agents config to ~/.agents" ln -sfn "$SCRIPT_DIR/agents" "$HOME/.agents"
+    echo ""
+fi
+
 # Install TPM + tmux plugins (automated)
 if command -v tmux >/dev/null 2>&1; then
-    echo "Step 15: Installing tmux plugins..."
+    echo "Step 16: Installing tmux plugins..."
     if [ ! -d "$HOME/.tmux/plugins/tpm" ]; then
         run_step "Cloning TPM" git clone https://github.com/tmux-plugins/tpm "$HOME/.tmux/plugins/tpm"
     fi
@@ -194,12 +204,12 @@ if command -v tmux >/dev/null 2>&1; then
     fi
     echo ""
 else
-    echo "Step 15: tmux not found, skipping plugin install"
+    echo "Step 16: tmux not found, skipping plugin install"
     echo ""
 fi
 
 # Setup SSH config (copy, don't symlink for security)
-echo "Step 16: Setting up SSH config..."
+echo "Step 17: Setting up SSH config..."
 run_step "Ensuring ~/.ssh exists" mkdir -p "$HOME/.ssh"
 run_step "Setting ~/.ssh permissions" chmod 700 "$HOME/.ssh"
 if [ ! -f "$HOME/.ssh/config" ]; then

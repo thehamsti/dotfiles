@@ -1,0 +1,269 @@
+{
+  "version": 3,
+  "skills": {
+    "playwriter": {
+      "source": "remorses/playwriter",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/remorses/playwriter.git",
+      "skillPath": "skills/playwriter/SKILL.md",
+      "skillFolderHash": "7dc2e2112461b1c0bd9a761531505ce93e482e35",
+      "installedAt": "2026-02-04T14:17:01.132Z",
+      "updatedAt": "2026-02-04T14:17:01.132Z"
+    },
+    "ai-sdk": {
+      "source": "vercel/ai",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/vercel/ai.git",
+      "skillPath": "skills/use-ai-sdk/SKILL.md",
+      "skillFolderHash": "d093459d6ee53c2dbc99278f34f053aef29c44ee",
+      "installedAt": "2026-02-05T04:56:45.107Z",
+      "updatedAt": "2026-02-05T04:56:45.107Z"
+    },
+    "ai-elements": {
+      "source": "vercel/ai-elements",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/vercel/ai-elements.git",
+      "skillPath": "skills/ai-elements/SKILL.md",
+      "skillFolderHash": "85b673815a592ad573cb9174ad77c4e84510ee4a",
+      "installedAt": "2026-02-05T06:44:21.529Z",
+      "updatedAt": "2026-02-05T06:44:21.529Z"
+    },
+    "ab-test-setup": {
+      "source": "coreyhaines31/marketingskills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/coreyhaines31/marketingskills.git",
+      "skillPath": "skills/ab-test-setup/SKILL.md",
+      "skillFolderHash": "aafbb757930f434e6ce2a25db8f4258a4da3b3b0",
+      "installedAt": "2026-02-05T23:53:38.444Z",
+      "updatedAt": "2026-02-05T23:53:38.444Z"
+    },
+    "analytics-tracking": {
+      "source": "coreyhaines31/marketingskills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/coreyhaines31/marketingskills.git",
+      "skillPath": "skills/analytics-tracking/SKILL.md",
+      "skillFolderHash": "b43d54cee8a87e04dbfa47497a3407a463394a15",
+      "installedAt": "2026-02-05T23:53:38.519Z",
+      "updatedAt": "2026-02-05T23:53:38.519Z"
+    },
+    "competitor-alternatives": {
+      "source": "coreyhaines31/marketingskills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/coreyhaines31/marketingskills.git",
+      "skillPath": "skills/competitor-alternatives/SKILL.md",
+      "skillFolderHash": "2a2951f65fd6969854be3409ea66564d2574cb81",
+      "installedAt": "2026-02-05T23:53:38.649Z",
+      "updatedAt": "2026-02-05T23:53:38.649Z"
+    },
+    "content-strategy": {
+      "source": "coreyhaines31/marketingskills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/coreyhaines31/marketingskills.git",
+      "skillPath": "skills/content-strategy/SKILL.md",
+      "skillFolderHash": "317f7af41b91eac68a6ba47b027031842ae3aa8b",
+      "installedAt": "2026-02-05T23:53:38.718Z",
+      "updatedAt": "2026-02-05T23:53:38.718Z"
+    },
+    "copy-editing": {
+      "source": "coreyhaines31/marketingskills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/coreyhaines31/marketingskills.git",
+      "skillPath": "skills/copy-editing/SKILL.md",
+      "skillFolderHash": "88550e43b132c0372d54a52638c49aa8ca4e1b13",
+      "installedAt": "2026-02-05T23:53:38.780Z",
+      "updatedAt": "2026-02-05T23:53:38.780Z"
+    },
+    "copywriting": {
+      "source": "coreyhaines31/marketingskills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/coreyhaines31/marketingskills.git",
+      "skillPath": "skills/copywriting/SKILL.md",
+      "skillFolderHash": "caa94beec4e4f2e4be0aab6203981fbed43a20b4",
+      "installedAt": "2026-02-05T23:53:38.848Z",
+      "updatedAt": "2026-02-05T23:53:38.848Z"
+    },
+    "email-sequence": {
+      "source": "coreyhaines31/marketingskills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/coreyhaines31/marketingskills.git",
+      "skillPath": "skills/email-sequence/SKILL.md",
+      "skillFolderHash": "775eeba47b660369cfa01608d93b7631c3a5731e",
+      "installedAt": "2026-02-05T23:53:38.920Z",
+      "updatedAt": "2026-02-05T23:53:38.920Z"
+    },
+    "form-cro": {
+      "source": "coreyhaines31/marketingskills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/coreyhaines31/marketingskills.git",
+      "skillPath": "skills/form-cro/SKILL.md",
+      "skillFolderHash": "7ac7e341876b41e47023d0ee2475af5fda6d5bcb",
+      "installedAt": "2026-02-05T23:53:38.983Z",
+      "updatedAt": "2026-02-05T23:53:38.983Z"
+    },
+    "free-tool-strategy": {
+      "source": "coreyhaines31/marketingskills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/coreyhaines31/marketingskills.git",
+      "skillPath": "skills/free-tool-strategy/SKILL.md",
+      "skillFolderHash": "8745054da0f5eee69b663384e7946ef86185b82c",
+      "installedAt": "2026-02-05T23:53:39.064Z",
+      "updatedAt": "2026-02-05T23:53:39.064Z"
+    },
+    "launch-strategy": {
+      "source": "coreyhaines31/marketingskills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/coreyhaines31/marketingskills.git",
+      "skillPath": "skills/launch-strategy/SKILL.md",
+      "skillFolderHash": "e2fa899e86d5154c5b371562758679b370f4aca9",
+      "installedAt": "2026-02-05T23:53:39.170Z",
+      "updatedAt": "2026-02-05T23:53:39.170Z"
+    },
+    "marketing-ideas": {
+      "source": "coreyhaines31/marketingskills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/coreyhaines31/marketingskills.git",
+      "skillPath": "skills/marketing-ideas/SKILL.md",
+      "skillFolderHash": "1369b697fe3face39abbc58d6ef9e47a446b60b0",
+      "installedAt": "2026-02-05T23:53:39.241Z",
+      "updatedAt": "2026-02-05T23:53:39.241Z"
+    },
+    "marketing-psychology": {
+      "source": "coreyhaines31/marketingskills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/coreyhaines31/marketingskills.git",
+      "skillPath": "skills/marketing-psychology/SKILL.md",
+      "skillFolderHash": "d571ffd2d18cc5f5d4300a0fb1f6595cfbdad5c9",
+      "installedAt": "2026-02-05T23:53:39.314Z",
+      "updatedAt": "2026-02-05T23:53:39.314Z"
+    },
+    "onboarding-cro": {
+      "source": "coreyhaines31/marketingskills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/coreyhaines31/marketingskills.git",
+      "skillPath": "skills/onboarding-cro/SKILL.md",
+      "skillFolderHash": "8d423bb73ebcceed63e061a4b4149d1770701006",
+      "installedAt": "2026-02-05T23:53:39.389Z",
+      "updatedAt": "2026-02-05T23:53:39.389Z"
+    },
+    "page-cro": {
+      "source": "coreyhaines31/marketingskills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/coreyhaines31/marketingskills.git",
+      "skillPath": "skills/page-cro/SKILL.md",
+      "skillFolderHash": "8af37be5a3f281d21b871660603e5bb266ca4d4e",
+      "installedAt": "2026-02-05T23:53:39.483Z",
+      "updatedAt": "2026-02-05T23:53:39.483Z"
+    },
+    "paid-ads": {
+      "source": "coreyhaines31/marketingskills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/coreyhaines31/marketingskills.git",
+      "skillPath": "skills/paid-ads/SKILL.md",
+      "skillFolderHash": "ecf66a08f5eab4fcd2e8ed2948c5af7bd409c672",
+      "installedAt": "2026-02-05T23:53:39.559Z",
+      "updatedAt": "2026-02-05T23:53:39.559Z"
+    },
+    "paywall-upgrade-cro": {
+      "source": "coreyhaines31/marketingskills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/coreyhaines31/marketingskills.git",
+      "skillPath": "skills/paywall-upgrade-cro/SKILL.md",
+      "skillFolderHash": "f6ca0ad7cd61346000d4ba15d5be9286a596ed85",
+      "installedAt": "2026-02-05T23:53:39.688Z",
+      "updatedAt": "2026-02-05T23:53:39.688Z"
+    },
+    "popup-cro": {
+      "source": "coreyhaines31/marketingskills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/coreyhaines31/marketingskills.git",
+      "skillPath": "skills/popup-cro/SKILL.md",
+      "skillFolderHash": "461a9a7cb55dff04cc2519be555600ebc8eace83",
+      "installedAt": "2026-02-05T23:53:39.750Z",
+      "updatedAt": "2026-02-05T23:53:39.750Z"
+    },
+    "pricing-strategy": {
+      "source": "coreyhaines31/marketingskills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/coreyhaines31/marketingskills.git",
+      "skillPath": "skills/pricing-strategy/SKILL.md",
+      "skillFolderHash": "8aad51edf4eebf96407a35ba660fad44f321cc49",
+      "installedAt": "2026-02-05T23:53:39.823Z",
+      "updatedAt": "2026-02-05T23:53:39.823Z"
+    },
+    "product-marketing-context": {
+      "source": "coreyhaines31/marketingskills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/coreyhaines31/marketingskills.git",
+      "skillPath": "skills/product-marketing-context/SKILL.md",
+      "skillFolderHash": "d52f8e7cd8ff9f249d92580bea67aac38ba0e145",
+      "installedAt": "2026-02-05T23:53:39.889Z",
+      "updatedAt": "2026-02-05T23:53:39.889Z"
+    },
+    "programmatic-seo": {
+      "source": "coreyhaines31/marketingskills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/coreyhaines31/marketingskills.git",
+      "skillPath": "skills/programmatic-seo/SKILL.md",
+      "skillFolderHash": "932c351e1bd634d911c4df278ac89078fdb4254d",
+      "installedAt": "2026-02-05T23:53:39.957Z",
+      "updatedAt": "2026-02-05T23:53:39.957Z"
+    },
+    "referral-program": {
+      "source": "coreyhaines31/marketingskills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/coreyhaines31/marketingskills.git",
+      "skillPath": "skills/referral-program/SKILL.md",
+      "skillFolderHash": "3285700af9c9f7283f125ce1cb08bac482125f57",
+      "installedAt": "2026-02-05T23:53:40.025Z",
+      "updatedAt": "2026-02-05T23:53:40.025Z"
+    },
+    "schema-markup": {
+      "source": "coreyhaines31/marketingskills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/coreyhaines31/marketingskills.git",
+      "skillPath": "skills/schema-markup/SKILL.md",
+      "skillFolderHash": "c20604277020f4b09faa6eddcaa081d560cad512",
+      "installedAt": "2026-02-05T23:53:40.093Z",
+      "updatedAt": "2026-02-05T23:53:40.093Z"
+    },
+    "seo-audit": {
+      "source": "coreyhaines31/marketingskills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/coreyhaines31/marketingskills.git",
+      "skillPath": "skills/seo-audit/SKILL.md",
+      "skillFolderHash": "a98fae5eae7cf90e32520fd1144e8c69f26c354c",
+      "installedAt": "2026-02-05T23:53:40.215Z",
+      "updatedAt": "2026-02-05T23:53:40.215Z"
+    },
+    "signup-flow-cro": {
+      "source": "coreyhaines31/marketingskills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/coreyhaines31/marketingskills.git",
+      "skillPath": "skills/signup-flow-cro/SKILL.md",
+      "skillFolderHash": "9d5cc720964e6bb2195c3935cc48a57762911b41",
+      "installedAt": "2026-02-05T23:53:40.286Z",
+      "updatedAt": "2026-02-05T23:53:40.286Z"
+    },
+    "social-content": {
+      "source": "coreyhaines31/marketingskills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/coreyhaines31/marketingskills.git",
+      "skillPath": "skills/social-content/SKILL.md",
+      "skillFolderHash": "3719a3b1e2ed9c15b7b58967d3a406c4a150b969",
+      "installedAt": "2026-02-05T23:53:40.362Z",
+      "updatedAt": "2026-02-05T23:53:40.362Z"
+    }
+  },
+  "dismissed": {
+    "findSkillsPrompt": true
+  },
+  "lastSelectedAgents": [
+    "amp",
+    "codex",
+    "gemini-cli",
+    "github-copilot",
+    "kimi-cli",
+    "opencode",
+    "claude-code"
+  ]
+}
