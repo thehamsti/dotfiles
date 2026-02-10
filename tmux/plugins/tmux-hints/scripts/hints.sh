@@ -17,7 +17,7 @@ Session / Windows
 Panes
   ${prefix_key} |        Split right
   ${prefix_key} -        Split down
-  ${prefix_key} o        Next pane
+  ${prefix_key} o        Next pane / exit sidebar
   ${prefix_key} q        Show pane numbers
   ${prefix_key} x        Kill pane
   ${prefix_key} z        Zoom pane
@@ -28,6 +28,8 @@ Navigation
   ${prefix_key} ]        Paste
 
 Other
+  ${prefix_key} e        Toggle session sidebar
+  ${prefix_key} E        Kill session (fzf picker)
   ${prefix_key} r        Reload config
 EOT
 }

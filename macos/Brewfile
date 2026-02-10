@@ -72,6 +72,7 @@ brew "act"                   # Run GitHub Actions locally
 brew "watchman"
 
 # Cloud & Infrastructure
+brew "awscli"
 brew "aws-elasticbeanstalk"
 brew "aws-sam-cli"
 brew "cloudflare/cloudflare/cloudflared"
