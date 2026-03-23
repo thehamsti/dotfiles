@@ -8,10 +8,10 @@ local spec = {
 
   -- Language packs
   { import = "astrocommunity.pack.lua" },
-  { import = "astrocommunity.pack.typescript-all-in-one" },
   { import = "astrocommunity.pack.tailwindcss" },
   { import = "astrocommunity.pack.terraform" },
-  { import = "astrocommunity.pack.python-ruff" },
+  { import = "astrocommunity.pack.python.base" },
+  { import = "astrocommunity.pack.python.ruff" },
   { import = "astrocommunity.pack.zig" },
   { import = "astrocommunity.pack.yaml" },
   { import = "astrocommunity.pack.toml" },
@@ -19,8 +19,6 @@ local spec = {
   { import = "astrocommunity.pack.bash" },
   { import = "astrocommunity.pack.json" },
   { import = "astrocommunity.pack.rust" },
-  { import = "astrocommunity.pack.go" },
-  { import = "astrocommunity.pack.docker" },
 
   -- UI stuff
   { import = "astrocommunity.indent.indent-rainbowline" },
@@ -29,15 +27,11 @@ local spec = {
 
   -- Editing stuff
   { import = "astrocommunity.editing-support.multiple-cursors-nvim" },
-  { import = "astrocommunity.editing-support.refactoring-nvim" },
 
   -- AI stuff
   { import = "astrocommunity.completion.supermaven-nvim" },
 
   -- Misc
-  { import = "astrocommunity.game.leetcode-nvim" },
-  { import = "astrocommunity.media.codesnap-nvim" },
-  { import = "astrocommunity.workflow.precognition-nvim" },
 }
 
 return spec
