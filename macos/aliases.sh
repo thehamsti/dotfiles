@@ -128,11 +128,14 @@ alias path='echo $PATH | tr ":" "\n"'
 
 # VPN (WireGuard)
 #
-# Defaults match the existing ~/.zshrc-style setup:
+# Defaults:
 #   vpnup -> sudo wg-quick up ~/wg0-bastion.conf
 # Override:
 #   VPN_CONF=~/foo.conf vpnup
 #   VPN_PROFILE=wg0 vpnup
+unalias vpnup vpndown vpnstatus vpn 2>/dev/null
+unfunction vpnup vpndown vpnstatus _vpn_target 2>/dev/null
+
 _vpn_target() {
     local arg="${1:-}"
     local conf="${VPN_CONF:-$HOME/wg0-bastion.conf}"
