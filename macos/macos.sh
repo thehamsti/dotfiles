@@ -2,12 +2,24 @@
 set -uo pipefail
 
 errors=()
+sudo_keeper=""
+
+cleanup() {
+    if [[ -n "$sudo_keeper" ]]; then
+        pkill -P "$sudo_keeper" 2>/dev/null || true
+        kill "$sudo_keeper" 2>/dev/null || true
+        wait "$sudo_keeper" 2>/dev/null || true
+    fi
+}
+trap cleanup EXIT
+trap 'exit 130' INT
+trap 'exit 143' TERM
 
 record_error() {
     local message="$1"
     errors+=("$message")
     if [ -n "${SETUP_ERRORS_FILE:-}" ]; then
-        printf "%s\n" "$message" >> "$SETUP_ERRORS_FILE"
+        printf "%s\n" "$message" >>"$SETUP_ERRORS_FILE"
     fi
 }
 
@@ -38,15 +50,14 @@ fi
 
 # Keep-alive: update existing `sudo` time stamp until `.macos` has finished
 if sudo -n true 2>/dev/null; then
-    while true; do
-        sudo -n true
-        sleep 60
-        kill -0 "$$" || exit
-    done 2>/dev/null &
+    (
+        while sleep 50; do sudo -n -v || exit; done
+    ) >/dev/null 2>&1 &
+    sudo_keeper=$!
 fi
 
 # Disable the sound effects on boot
-run_step "Disabling boot sound effects" sudo nvram SystemAudioVolume=" "
+run_step "Disabling boot sound effects" sudo -n nvram SystemAudioVolume=" "
 
 # Always show scrollbars
 run_step "Always show scrollbars" defaults write NSGlobalDomain AppleShowScrollBars -string "Always"
@@ -58,9 +69,6 @@ run_step "Expand save panel (mode 2)" defaults write NSGlobalDomain NSNavPanelEx
 # Expand print panel by default
 run_step "Expand print panel (mode 1)" defaults write NSGlobalDomain PMPrintingExpandedStateForPrint -bool true
 run_step "Expand print panel (mode 2)" defaults write NSGlobalDomain PMPrintingExpandedStateForPrint2 -bool true
-
-# Disable the "Are you sure you want to open this application?" dialog
-run_step "Disable app launch quarantine dialog" defaults write com.apple.LaunchServices LSQuarantine -bool false
 
 # Enable full keyboard access for all controls (Tab in modal dialogs)
 run_step "Enable full keyboard access (Tab in dialogs)" defaults write NSGlobalDomain AppleKeyboardUIMode -int 3
@@ -102,7 +110,7 @@ run_step "Finder: disable extension change warning" defaults write com.apple.fin
 # Show the ~/Library folder
 # chflags nohidden ~/Library && xattr -d com.apple.FinderInfo ~/Library
 # Show the /Volumes folder
-run_step "Show /Volumes folder" sudo chflags nohidden /Volumes
+run_step "Show /Volumes folder" sudo -n chflags nohidden /Volumes
 
 # Set the icon size of Dock items to 36 pixels
 run_step "Dock: set icon size to 36" defaults write com.apple.dock tilesize -int 36
@@ -144,20 +152,9 @@ run_step "Activity Monitor: show CPU in Dock icon" defaults write com.apple.Acti
 run_step "Activity Monitor: sort by CPU usage" defaults write com.apple.ActivityMonitor SortColumn -string "CPUUsage"
 run_step "Activity Monitor: sort direction" defaults write com.apple.ActivityMonitor SortDirection -int 0
 
-for app in "Activity Monitor" \
-    "Address Book" \
-    "Calendar" \
-    "cfprefsd" \
-    "Contacts" \
-    "Dock" \
+for app in "Dock" \
     "Finder" \
-    "Mail" \
-    "Messages" \
-    "Photos" \
-    "Safari" \
-    "SystemUIServer" \
-    "Terminal" \
-    "Transmission"; do
+    "SystemUIServer"; do
     killall "${app}" &>/dev/null || true
 done
 echo "Done. Note that some of these changes require a logout/restart to take effect."

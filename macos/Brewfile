@@ -1,164 +1,86 @@
-# Homebrew Bundle - https://github.com/Homebrew/homebrew-bundle
-# Run with: brew bundle --file=~/dotfiles/macos/Brewfile
+# Runtimes and portable CLIs live in ../mise.toml.
+# Homebrew retains native libraries, services, system tools, and desktop apps.
+# See homebrew-review.md for the installed-package audit and exceptions.
 
-# Taps
-tap "cloudflare/cloudflare"
-tap "jesseduffield/lazygit"
-tap "localstack/tap"
-tap "planetscale/tap"
-tap "sst/tap"
-tap "stripe/stripe-cli"
-tap "supabase/tap"
 tap "ubuntu/microk8s"
+tap "teamookla/speedtest"
 
-# =============================================================================
-# CLI Tools
-# =============================================================================
-
-# Core utilities
+# Bootstrap and system utilities
+brew "mise"
+brew "bash"
 brew "git"
 brew "wget"
-brew "jq"
-brew "yq"
-brew "ripgrep"
-brew "fd"                    # Better find
-brew "eza"                   # Better ls (successor to exa)
-brew "bat"                   # Better cat
-brew "tree"                  # Directory listing
-brew "fzf"                   # Fuzzy finder
-brew "zoxide"                # Smarter cd (replaces z)
-
-# Git tools
-brew "gh"                    # GitHub CLI
-brew "jesseduffield/lazygit/lazygit"
-brew "diff-so-fancy"
-brew "delta"                 # Better git diff viewer
-
-# System monitoring
+brew "coreutils"
+brew "tree"
 brew "btop"
 brew "htop"
-brew "speedtest-cli"
 brew "fping"
+brew "flock"
+brew "multitime"
+brew "nmap"
+brew "sshpass"
+brew "teamookla/speedtest/speedtest"
+brew "terminal-notifier"
 
-# Networking / VPN
-brew "wireguard-tools"       # wg, wg-quick
-brew "wireguard-go"          # userspace WireGuard implementation (macOS compatible)
-
-# Development - Languages & Runtimes
-brew "mise"                  # Polyglot runtime manager (node, python, etc.)
-brew "deno"
-brew "go"
-brew "uv"                    # Python package manager
-brew "ruff"                  # Python linter
-brew "pipx"
-brew "dotnet"
-brew "dotnet@8"
+# Native development tools and libraries
 brew "gcc"
-brew "cmake"
+brew "llvm"
 brew "llvm@17"
-brew "protobuf"
-brew "scala"
-brew "sbt"
-
-# Development - Tools
-brew "neovim"
-brew "tree-sitter-cli"
-brew "helix"
+brew "clang-format"
+brew "pkgconf"
+brew "create-dmg"
 brew "tmux"
-brew "tmuxinator"
 brew "pam-reattach"
-brew "ranger"
-brew "act"                   # Run GitHub Actions locally
 brew "watchman"
-
-# Cloud & Infrastructure
-brew "awscli"
-brew "aws-elasticbeanstalk"
-brew "aws-sam-cli"
-brew "cloudflare/cloudflare/cloudflared"
-brew "doctl"                 # DigitalOcean CLI
-cask "gcloud-cli"            # Google Cloud CLI (gcloud)
-brew "rclone"                # Google Drive CLI (via rclone drive backend)
-brew "sst/tap/sst"
-brew "localstack/tap/localstack-cli"
-brew "planetscale/tap/pscale"
-brew "stripe/stripe-cli/stripe"
-brew "supabase/tap/supabase"
-brew "ubuntu/microk8s/microk8s"
-
-# Database
-brew "mysql-client"
-brew "postgresql@17"
-brew "postgresql@18"
-
-# Ruby
-brew "rbenv"
-brew "rbenv-default-gems"
-brew "rbenv-gemset"
-
-# iOS Development
-brew "cocoapods"
-
-# Media & Files
-brew "ffmpeg"
-brew "sox"
-brew "graphviz"
-brew "gdrive"
-
-# AI/ML
-brew "ollama"
-brew "livekit"
-brew "portaudio"
-
-# Package managers
-brew "pnpm"
-brew "yarn"
-
-# Shell enhancements
-brew "starship"              # Modern, fast prompt
-brew "direnv"                # Auto-load env vars per directory
-
-# Misc CLI
-brew "fastfetch"             # System info (replaces neofetch)
-cask "1password-cli"
-
-# Libraries (dependencies)
 brew "gdbm"
 brew "libev"
 brew "mvfst"
 
-# =============================================================================
-# Desktop Applications (Casks)
-# =============================================================================
+# Existing rbenv plugins remain available for legacy project gemsets.
+# New/default Ruby and Ruby CLIs are managed by mise.
+brew "rbenv"
+brew "rbenv-default-gems"
+brew "rbenv-gemset"
 
-# Terminals & Editors
+# Networking and database services/headers
+brew "wireguard-tools"
+brew "wireguard-go"
+brew "freerdp"
+brew "ubuntu/microk8s/microk8s"
+brew "mysql-client"
+brew "postgresql@17"
+brew "postgresql@18"
+brew "libpq"
+
+# Native media libraries and tools without suitable upstream Mac binaries
+brew "ffmpeg"
+brew "sox"
+brew "graphviz"
+brew "gdrive"
+brew "livekit"
+brew "portaudio"
+brew "espeak-ng"
+brew "ollama"
+
+# Desktop apps (including previously configured apps not currently installed)
 cask "ghostty"
 cask "wezterm"
 cask "zed"
 cask "sublime-text"
-
-# Development
-cask "orbstack"              # Docker (includes docker CLI, superior to Docker Desktop)
-cask "bruno"                 # API client
-cask "multipass"             # Ubuntu VMs
-
-# Productivity
+cask "orbstack"
+cask "bruno"
+cask "multipass"
 cask "raycast"
-cask "rectangle"             # Window management
-cask "jordanbaird-ice"       # Menu bar management
-cask "caffeine"              # Prevent sleep
+cask "rectangle"
+cask "jordanbaird-ice"
+cask "caffeine"
 cask "dropbox"
 cask "nextcloud"
-
-# Utilities
-cask "stats"                 # System stats in menu bar
-cask "flux-app"              # Night shift
-cask "superduper"            # Backup
-
-# Media
+cask "stats"
+cask "flux-app"
+cask "codexbar"
+cask "superduper"
 cask "vlc"
 cask "transmission"
-
-# Academic
 cask "mactex"
 cask "zotero"

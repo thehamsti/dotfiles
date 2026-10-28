@@ -1,0 +1,11 @@
+pi
+omp
+claude
+codex
+droid
+kimi
+opencode
+hermes
+cursor
+antigravity-cli
+grok

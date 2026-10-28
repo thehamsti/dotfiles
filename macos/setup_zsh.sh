@@ -2,13 +2,14 @@
 set -uo pipefail
 
 errors=()
-ZSHRC="$HOME/.zshrc"
+ZSHRC="${ZDOTDIR:-$HOME}/.zshrc"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
 record_error() {
     local message="$1"
     errors+=("$message")
     if [ -n "${SETUP_ERRORS_FILE:-}" ]; then
-        printf "%s\n" "$message" >> "$SETUP_ERRORS_FILE"
+        printf "%s\n" "$message" >>"$SETUP_ERRORS_FILE"
     fi
 }
 
@@ -25,6 +26,7 @@ run_step() {
     fi
 }
 
+run_step "Ensuring Zsh config directory exists" mkdir -p "$(dirname "$ZSHRC")"
 # Ensure .zshrc exists
 run_step "Ensuring ~/.zshrc exists" touch "$ZSHRC"
 
@@ -135,24 +137,7 @@ EOF"
     fi
 fi
 
-# Install or upgrade Bun
-if command -v bun &>/dev/null; then
-    run_step "Upgrading Bun" bun upgrade
-elif [ -x "$HOME/.bun/bin/bun" ]; then
-    run_step "Upgrading Bun" "$HOME/.bun/bin/bun" upgrade
-else
-    run_step "Installing Bun" bash -c "curl -fsSL https://bun.sh/install | bash"
-fi
-
-# Add Bun to PATH in .zshrc
-if ! grep -qF "BUN_INSTALL" "$ZSHRC" 2>/dev/null; then
-    run_step "Adding Bun to .zshrc" bash -c "cat >> \"$ZSHRC\" <<'EOF'
-
-# Bun
-export BUN_INSTALL=\"\$HOME/.bun\"
-export PATH=\"\$BUN_INSTALL/bin:\$PATH\"
-EOF"
-fi
+run_step "Optimizing Zsh startup..." bun "$SCRIPT_DIR/configure_zsh.ts" "$ZSHRC"
 
 echo ""
 echo "ZSH setup complete!"

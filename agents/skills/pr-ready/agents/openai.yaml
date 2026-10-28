@@ -1,0 +1,4 @@
+interface:
+  display_name: "PR Ready"
+  short_description: "Create a PR and finish CI and bot review follow-ups"
+  default_prompt: "Use $pr-ready to create a non-draft PR and keep fixing CI and bot feedback until the current head is green and reviews are quiet."

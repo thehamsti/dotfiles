@@ -90,7 +90,8 @@ git_config "Enable rerere" rerere.enabled true
 
 # Improve performance for large repos
 git_config "Enable manyFiles optimization" feature.manyFiles true
-git_config "Enable fsmonitor" core.fsmonitor true
+# Global FSMonitor stalls Starship's read-only status checks on this macOS setup.
+git_config "Keep fsmonitor opt-in per repository" core.fsmonitor false
 
 # Use global gitignore
 git_config "Use global gitignore" core.excludesfile ~/.gitignore_global
@@ -104,6 +105,7 @@ git_config "Sort branches by recent commit" branch.sort -committerdate
 # Better merge tool (nvim)
 if command -v nvim &>/dev/null; then
     git_config "Set merge tool to nvimdiff" merge.tool nvimdiff
+    # shellcheck disable=SC2016
     git_config "Configure nvimdiff command" mergetool.nvimdiff.cmd 'nvim -d "$LOCAL" "$REMOTE" "$MERGED" -c "wincmd w" -c "wincmd J"'
     git_config "Disable mergetool prompt" mergetool.prompt false
     git_config "Disable mergetool backups" mergetool.keepBackup false

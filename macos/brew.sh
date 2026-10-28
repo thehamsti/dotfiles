@@ -1,5 +1,6 @@
 #!/bin/bash
 set -uo pipefail
+export HOMEBREW_NO_ASK=1 HOMEBREW_NO_AUTOREMOVE=1
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 BREWFILE="$SCRIPT_DIR/Brewfile"

@@ -2,8 +2,44 @@
 set -uo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-ERRORS_FILE="$(mktemp -t setup_macos_errors.XXXXXX 2>/dev/null || printf "/tmp/setup_macos_errors.%s" "$$")"
+ERRORS_FILE="$(mktemp -t setup_macos_errors.XXXXXX)" || exit 1
 errors=()
+sudo_keeper=""
+
+cleanup() {
+    if [[ -n "$sudo_keeper" ]]; then
+        pkill -P "$sudo_keeper" 2>/dev/null || true
+        kill "$sudo_keeper" 2>/dev/null || true
+        wait "$sudo_keeper" 2>/dev/null || true
+    fi
+    rm -f "$ERRORS_FILE"
+}
+trap cleanup EXIT
+trap 'exit 130' INT
+trap 'exit 143' TERM
+
+link_config() { bash "$SCRIPT_DIR/macos/link_config.sh" "$@"; }
+
+load_homebrew_env() {
+    local brew_binary shellenv profile brew_init
+    brew_binary="$(command -v brew || true)"
+    if [[ -z "$brew_binary" ]]; then
+        if [[ -x /opt/homebrew/bin/brew ]]; then
+            brew_binary=/opt/homebrew/bin/brew
+        else
+            brew_binary=/usr/local/bin/brew
+        fi
+    fi
+    shellenv="$("$brew_binary" shellenv)" || return $?
+    eval "$shellenv"
+    profile="${ZDOTDIR:-$HOME}/.zprofile"
+    mkdir -p "$(dirname "$profile")"
+    # shellcheck disable=SC2016
+    printf -v brew_init 'eval "$(%q shellenv)"' "$brew_binary"
+    if ! grep -qxF "$brew_init" "$profile" 2>/dev/null; then
+        printf '\n# Homebrew\n%s\n' "$brew_init" >>"$profile"
+    fi
+}
 
 record_error() {
     local message="$1"
@@ -26,17 +62,33 @@ run_step() {
 echo "=== macOS Dotfiles Setup ==="
 echo ""
 
+if ! sudo -v; then
+    echo "Setup needs administrator access. Run it in an interactive terminal." >&2
+    exit 1
+fi
+(
+    while sleep 50; do sudo -n -v || exit; done
+) >/dev/null 2>&1 &
+sudo_keeper=$!
+
 # Run macOS defaults first (before installing anything)
 export SETUP_ERRORS_FILE="$ERRORS_FILE"
 run_step "Step 1: Configuring macOS defaults..." "$SCRIPT_DIR/macos/macos.sh"
 echo ""
 
-# Setup ZSH and Oh My Zsh
-run_step "Step 2: Setting up ZSH..." "$SCRIPT_DIR/macos/setup_zsh.sh"
+# Install package managers before configuring shell integrations.
+run_step "Step 2: Installing Homebrew packages..." "$SCRIPT_DIR/macos/brew.sh"
+run_step "Loading Homebrew environment..." load_homebrew_env
 echo ""
 
-# Install Homebrew and packages
-run_step "Step 3: Installing Homebrew packages..." "$SCRIPT_DIR/macos/brew.sh"
+run_step "Step 3: Installing mise tools..." bash "$SCRIPT_DIR/macos/mise.sh"
+export PATH="${MISE_DATA_DIR:-${XDG_DATA_HOME:-$HOME/.local/share}/mise}/shims:$PATH"
+echo ""
+
+run_step "Setting up ZSH..." "$SCRIPT_DIR/macos/setup_zsh.sh"
+echo ""
+
+run_step "Setting up Herdr config and agent integrations..." bash "$SCRIPT_DIR/macos/herdr.sh"
 echo ""
 
 # Enable Touch ID for sudo inside tmux
@@ -49,13 +101,9 @@ elif [ -f "/usr/local/lib/pam/pam_reattach.so" ]; then
 fi
 
 if [ -n "$PAM_REATTACH_PATH" ]; then
-    if grep -q "pam_reattach.so" /etc/pam.d/sudo 2>/dev/null; then
-        echo "pam_reattach already configured in /etc/pam.d/sudo"
-    else
-        TMP_SUDO="$(mktemp -t sudo.pam.XXXXXX 2>/dev/null || printf "/tmp/sudo.pam.%s" "$$")"
-        run_step "Backing up /etc/pam.d/sudo" sudo cp /etc/pam.d/sudo /etc/pam.d/sudo.bak
-        run_step "Adding pam_reattach to /etc/pam.d/sudo" bash -c "awk -v line='auth optional $PAM_REATTACH_PATH ignore_ssh' 'NR==1{print line} {print}' /etc/pam.d/sudo > \"$TMP_SUDO\" && sudo mv \"$TMP_SUDO\" /etc/pam.d/sudo"
-    fi
+    run_step "Repairing sudo PAM ownership" sudo -n chown root:wheel /etc/pam.d/sudo
+    run_step "Repairing sudo PAM permissions" sudo -n chmod 644 /etc/pam.d/sudo
+    run_step "Installing Touch ID configuration in sudo_local" bash "$SCRIPT_DIR/macos/setup_sudo.sh" "$PAM_REATTACH_PATH" /etc/pam.d/sudo_local
 else
     echo "pam_reattach not found, skipping (brew install pam-reattach)"
 fi
@@ -69,62 +117,33 @@ echo ""
 run_step "Step 6: Configuring git..." "$SCRIPT_DIR/macos/git.sh"
 echo ""
 
-# Install Powerline
-echo "Step 7: Installing Powerline..."
-if command -v python3 >/dev/null 2>&1; then
-    if command -v powerline-config >/dev/null 2>&1; then
-        echo "powerline-config already installed"
-    else
-        run_step "Installing powerline-status (pip --user)" python3 -m pip install --user powerline-status
-    fi
-    PYTHON_USER_BIN="$(python3 -c 'import site; print(site.USER_BASE + \"/bin\")')"
-    if [ -n "$PYTHON_USER_BIN" ] && [ -f "$HOME/.zshrc" ] && ! grep -qF "$PYTHON_USER_BIN" "$HOME/.zshrc" 2>/dev/null; then
-        run_step "Adding Python user bin to .zshrc" bash -c "cat >> \"$HOME/.zshrc\" <<'EOF'\n\n# Python user bin (powerline-config)\nexport PATH=\"$PYTHON_USER_BIN:\\$PATH\"\nEOF"
-    fi
-else
-    echo "python3 not found, skipping Powerline install"
-fi
+# Powerline is installed in an isolated Python environment by mise.
+run_step "Step 7: Verifying Powerline..." mise -C "$SCRIPT_DIR" exec -- powerline-config --help
 echo ""
 
 # Symlink neovim config
 echo "Step 8: Symlinking Neovim configuration..."
-if [ -d "$HOME/.config/nvim" ] && [ ! -L "$HOME/.config/nvim" ]; then
-    run_step "Backing up existing nvim config to ~/.config/nvim.bak" mv "$HOME/.config/nvim" "$HOME/.config/nvim.bak"
-fi
-run_step "Ensuring ~/.config exists" mkdir -p "$HOME/.config"
-run_step "Symlinking Neovim config to ~/.config/nvim" ln -sf "$SCRIPT_DIR/neovim/nvim" "$HOME/.config/nvim"
+run_step "Symlinking Neovim config to ~/.config/nvim" link_config "$SCRIPT_DIR/neovim/nvim" "$HOME/.config/nvim"
 echo ""
 
 # Symlink global gitignore
-run_step "Step 9: Symlinking global gitignore..." ln -sf "$SCRIPT_DIR/gitignore_global" "$HOME/.gitignore_global"
+run_step "Step 9: Symlinking global gitignore..." link_config "$SCRIPT_DIR/gitignore_global" "$HOME/.gitignore_global"
 echo ""
 
 # Symlink starship config if it exists
 if [ -f "$SCRIPT_DIR/starship.toml" ]; then
     echo "Step 10: Symlinking starship config..."
-    if [ -f "$HOME/.config/starship.toml" ] && [ ! -L "$HOME/.config/starship.toml" ]; then
-        run_step "Backing up existing starship config to ~/.config/starship.toml.bak" mv "$HOME/.config/starship.toml" "$HOME/.config/starship.toml.bak"
-    fi
-    run_step "Ensuring ~/.config exists" mkdir -p "$HOME/.config"
-    run_step "Symlinking starship config to ~/.config/starship.toml" ln -sf "$SCRIPT_DIR/starship.toml" "$HOME/.config/starship.toml"
+    run_step "Symlinking starship config to ~/.config/starship.toml" link_config "$SCRIPT_DIR/starship.toml" "$HOME/.config/starship.toml"
     echo ""
 fi
 
 # Symlink tmux config
 if [ -f "$SCRIPT_DIR/tmux/tmux.conf" ]; then
     echo "Step 11: Symlinking tmux config..."
-    if [ -f "$HOME/.config/tmux/tmux.conf" ] && [ ! -L "$HOME/.config/tmux/tmux.conf" ]; then
-        run_step "Backing up existing tmux config to ~/.config/tmux/tmux.conf.bak" mv "$HOME/.config/tmux/tmux.conf" "$HOME/.config/tmux/tmux.conf.bak"
-    fi
-    if [ -f "$HOME/.tmux.conf" ] && [ ! -L "$HOME/.tmux.conf" ]; then
-        run_step "Backing up existing ~/.tmux.conf to ~/.tmux.conf.bak" mv "$HOME/.tmux.conf" "$HOME/.tmux.conf.bak"
-    fi
-    run_step "Ensuring ~/.config/tmux exists" mkdir -p "$HOME/.config/tmux"
-    run_step "Symlinking tmux config to ~/.config/tmux/tmux.conf" ln -sf "$SCRIPT_DIR/tmux/tmux.conf" "$HOME/.config/tmux/tmux.conf"
-    run_step "Symlinking tmux config to ~/.tmux.conf" ln -sf "$HOME/.config/tmux/tmux.conf" "$HOME/.tmux.conf"
+    run_step "Symlinking tmux config to ~/.config/tmux/tmux.conf" link_config "$SCRIPT_DIR/tmux/tmux.conf" "$HOME/.config/tmux/tmux.conf"
+    run_step "Symlinking tmux config to ~/.tmux.conf" link_config "$HOME/.config/tmux/tmux.conf" "$HOME/.tmux.conf"
     if [ -d "$SCRIPT_DIR/tmux/scripts" ]; then
-        run_step "Symlinking tmux scripts to ~/.config/tmux/scripts" ln -sfn "$SCRIPT_DIR/tmux/scripts" "$HOME/.config/tmux/scripts"
-        run_step "Ensuring tmux scripts are executable" chmod -R +x "$SCRIPT_DIR/tmux/scripts"
+        run_step "Symlinking tmux scripts to ~/.config/tmux/scripts" link_config "$SCRIPT_DIR/tmux/scripts" "$HOME/.config/tmux/scripts"
     fi
     echo ""
 fi
@@ -136,7 +155,7 @@ if [ -d "$SCRIPT_DIR/tmux/plugins" ]; then
     for plugin in "$SCRIPT_DIR"/tmux/plugins/*; do
         [ -d "$plugin" ] || continue
         plugin_name="$(basename "$plugin")"
-        run_step "Symlinking tmux plugin: $plugin_name" ln -sfn "$plugin" "$HOME/.tmux/plugins/$plugin_name"
+        run_step "Symlinking tmux plugin: $plugin_name" link_config "$plugin" "$HOME/.tmux/plugins/$plugin_name"
     done
     echo ""
 fi
@@ -144,31 +163,22 @@ fi
 # Symlink Powerline config
 if [ -d "$SCRIPT_DIR/powerline" ]; then
     echo "Step 13: Symlinking Powerline config..."
-    if [ -e "$HOME/.config/powerline" ] && [ ! -L "$HOME/.config/powerline" ]; then
-        run_step "Backing up existing ~/.config/powerline to ~/.config/powerline.bak" mv "$HOME/.config/powerline" "$HOME/.config/powerline.bak"
-    fi
-    run_step "Ensuring ~/.config exists" mkdir -p "$HOME/.config"
-    run_step "Symlinking Powerline config to ~/.config/powerline" ln -sfn "$SCRIPT_DIR/powerline" "$HOME/.config/powerline"
+    run_step "Symlinking Powerline config to ~/.config/powerline" link_config "$SCRIPT_DIR/powerline" "$HOME/.config/powerline"
     echo ""
 fi
 
 # Symlink tmuxinator config
 if [ -d "$SCRIPT_DIR/tmuxinator" ]; then
     echo "Step 14: Symlinking tmuxinator config..."
-    if [ -e "$HOME/.tmuxinator" ] && [ ! -L "$HOME/.tmuxinator" ]; then
-        run_step "Backing up existing ~/.tmuxinator to ~/.tmuxinator.bak" mv "$HOME/.tmuxinator" "$HOME/.tmuxinator.bak"
-    fi
-    run_step "Symlinking tmuxinator config to ~/.tmuxinator" ln -sfn "$SCRIPT_DIR/tmuxinator" "$HOME/.tmuxinator"
+    run_step "Symlinking tmuxinator config to ~/.tmuxinator" link_config "$SCRIPT_DIR/tmuxinator" "$HOME/.tmuxinator"
     echo ""
 fi
 
 # Symlink agents config (Claude Code skills)
 if [ -d "$SCRIPT_DIR/agents" ]; then
     echo "Step 15: Symlinking agents config..."
-    if [ -e "$HOME/.agents" ] && [ ! -L "$HOME/.agents" ]; then
-        run_step "Backing up existing ~/.agents to ~/.agents.bak" mv "$HOME/.agents" "$HOME/.agents.bak"
-    fi
-    run_step "Symlinking agents config to ~/.agents" ln -sfn "$SCRIPT_DIR/agents" "$HOME/.agents"
+    run_step "Symlinking agents config to ~/.agents" link_config "$SCRIPT_DIR/agents" "$HOME/.agents"
+    run_step "Installing shared agent skills..." bash "$SCRIPT_DIR/macos/skills.sh"
     echo ""
 fi
 
@@ -226,7 +236,7 @@ if [ -f "$ERRORS_FILE" ] && [ -s "$ERRORS_FILE" ]; then
     echo "Detailed errors from child scripts:"
     while IFS= read -r line; do
         [ -n "$line" ] && echo "  - $line"
-    done < "$ERRORS_FILE"
+    done <"$ERRORS_FILE"
     echo ""
 fi
 
@@ -241,7 +251,7 @@ fi
 echo "Next steps:"
 echo "  1. Restart your terminal or run: source ~/.zshrc"
 echo "  2. Open Neovim to install plugins: nvim"
-echo "  3. Run 'mise use node@lts' to install Node.js"
+echo "  3. Run 'mise ls' to inspect the installed runtimes and CLI tools"
 echo "  4. Customize ~/.ssh/config if needed"
 echo "  5. Some macOS changes may require a logout/restart"
 echo ""

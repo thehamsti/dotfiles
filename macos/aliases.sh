@@ -101,6 +101,8 @@ alias dprune="docker system prune -af"
 alias vim="nvim"
 alias v="nvim"
 alias code="zed"
+alias claud='CLAUDE_CONFIG_DIR="$HOME/.claude_personal1" claude'
+alias claudw='CLAUDE_CONFIG_DIR="$HOME/.claude_work" claude'
 
 # Node/Bun
 alias nr="npm run"
@@ -193,7 +195,7 @@ vpnstatus() {
 alias vpn="vpnstatus"
 
 # System update
-alias update='sudo softwareupdate -i -a; nup; brew update; brew upgrade; brew cleanup; bun-update-globals'
+alias update='bash ~/dotfiles/macos/update.sh'
 
 # Clipboard
 alias c="tr -d '\n' | pbcopy"
@@ -244,7 +246,7 @@ alias nbrew='${EDITOR:-nvim} ~/dotfiles/nix/darwin/homebrew.nix'    # edit homeb
 # Config shortcuts
 # =============================================================================
 
-alias reload='source ~/.zshrc'
+alias reload='source ~/dotfiles/macos/reload.zsh'
 alias zshrc='${EDITOR:-nvim} ~/.zshrc'
 alias aliases='${EDITOR:-nvim} ~/dotfiles/macos/aliases.sh'
 alias dotfiles='cd ~/dotfiles'
@@ -347,18 +349,10 @@ bun-update-globals() {
         return 1
     fi
 
-    if ! pkg_list="$(python3 - "$global_pkg_json" <<'PY'
-import json
-import sys
-
-path = sys.argv[1]
-with open(path, "r", encoding="utf-8") as f:
-    data = json.load(f)
-
-deps = data.get("dependencies") or {}
-for name in deps:
-    print(name)
-PY
+    if ! pkg_list="$(bun -e '
+const manifest = await Bun.file(process.argv[1]).json();
+for (const name of Object.keys(manifest.dependencies ?? {})) console.log(name);
+' "$global_pkg_json"
     )"; then
         echo "Failed to parse bun global package list: $global_pkg_json"
         return 1

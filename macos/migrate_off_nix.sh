@@ -7,14 +7,17 @@ DOTFILES_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 timestamp() { date +"%Y%m%d-%H%M%S"; }
 
 log() { printf "%s\n" "$*"; }
-die() { printf "error: %s\n" "$*" >&2; exit 1; }
+die() {
+  printf "error: %s\n" "$*" >&2
+  exit 1
+}
 
 AUTO_YES=0
 NONINTERACTIVE=0
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
-    -y|--yes)
+    -y | --yes)
       AUTO_YES=1
       shift
       ;;
@@ -22,7 +25,7 @@ while [[ $# -gt 0 ]]; do
       NONINTERACTIVE=1
       shift
       ;;
-    -h|--help)
+    -h | --help)
       cat <<'EOF'
 Usage: migrate_off_nix.sh [--yes] [--noninteractive]
 
@@ -229,17 +232,19 @@ fi
 eval "$(/opt/homebrew/bin/brew shellenv)"
 
 # Ensure future shells pick up Homebrew.
+# shellcheck disable=SC2016
+BREW_INIT='eval "$(/opt/homebrew/bin/brew shellenv)"'
 if [[ -f "$HOME/.zprofile" ]]; then
   if ! grep -qF "/opt/homebrew/bin/brew shellenv" "$HOME/.zprofile"; then
     {
       printf "\n# Homebrew (Apple Silicon)\n"
-      printf "eval \"$(/opt/homebrew/bin/brew shellenv)\"\n"
+      printf '%s\n' "$BREW_INIT"
     } >>"$HOME/.zprofile"
   fi
 else
   {
     printf "# Homebrew (Apple Silicon)\n"
-    printf "eval \"$(/opt/homebrew/bin/brew shellenv)\"\n"
+    printf '%s\n' "$BREW_INIT"
   } >"$HOME/.zprofile"
 fi
 

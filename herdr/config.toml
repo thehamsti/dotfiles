@@ -1,0 +1,219 @@
+onboarding = false
+# Mirrors the Omarchy tmux config in config/tmux/tmux.conf
+# tmux session -> herdr workspace, tmux window -> herdr tab, tmux pane -> herdr pane
+
+[theme]
+# tmux ran on the terminal's own palette (bg=default, fg=default, ANSI blue accents)
+name = "tokyo-night"
+
+auto_switch = false
+[theme.custom]
+# The active tab is drawn as panel_bg text on an accent background, so panel_bg
+# has to be dark for it to read - same colors as status-left's "#[fg=black,bg=blue]"
+panel_bg = "black"
+
+[terminal]
+# Matches -c "#{pane_current_path}" on every split, window, and session
+new_cwd = "follow"
+
+[keys]
+prefix = "ctrl+b"
+
+# Config and help
+reload_config = "prefix+q"
+help = "prefix+?"
+detach = "prefix+d"
+
+# Copy mode
+copy_mode = "prefix+["
+
+# Panes
+split_horizontal = ["prefix+h", "alt+enter"]
+split_vertical = ["prefix+v", "alt+shift+enter"]
+close_pane = ["prefix+x", "alt+esc"]
+zoom = "prefix+z"
+last_pane = "prefix+;"
+
+focus_pane_left = "ctrl+alt+left"
+focus_pane_down = "ctrl+alt+down"
+focus_pane_up = "ctrl+alt+up"
+focus_pane_right = "ctrl+alt+right"
+
+resize_mode = ["prefix+ctrl+left", "prefix+ctrl+down", "prefix+ctrl+up", "prefix+ctrl+right"]
+
+# Like resize-pane on C-M-S-arrows
+resize_pane_left = "ctrl+alt+shift+left"
+resize_pane_down = "ctrl+alt+shift+down"
+resize_pane_up = "ctrl+alt+shift+up"
+resize_pane_right = "ctrl+alt+shift+right"
+
+# No tmux equivalent; herdr's default prefix+shift+p is taken by previous session
+rename_pane = "prefix+shift+o"
+
+# Windows -> tabs
+new_tab = "prefix+c"
+rename_tab = "prefix+r"
+close_tab = "prefix+k"
+switch_tab = ["prefix+1..9", "alt+1..9"]
+previous_tab = ["prefix+p", "alt+left"]
+next_tab = ["prefix+n", "alt+right"]
+
+# Like swap-window -t -1/+1 on M-S-Left/Right
+move_tab_previous = "alt+shift+left"
+move_tab_next = "alt+shift+right"
+
+# Sessions -> workspaces
+new_workspace = "prefix+shift+c"
+rename_workspace = "prefix+shift+r"
+# Owned by the prefix+shift+k command below, which also removes a linked worktree.
+close_workspace = ""
+previous_workspace = ["prefix+shift+p", "alt+up"]
+next_workspace = ["prefix+shift+n", "alt+down"]
+
+# New worktree from origin/main (stock new_worktree branches from HEAD)
+[[keys.command]]
+key = "prefix+shift+w"
+type = "popup"
+description = "new worktree from origin/main"
+width = "60%"
+height = "30%"
+command = '''
+bin="${HERDR_BIN_PATH:-herdr}"
+cwd="${HERDR_ACTIVE_PANE_CWD:-}"
+ws="${HERDR_ACTIVE_WORKSPACE_ID:-}"
+
+fail() {
+  printf '\n%s\nPress Enter to close.\n' "$1"
+  IFS= read -r _
+  exit 1
+}
+
+[ -n "$ws" ] || fail "No active workspace."
+[ -n "$cwd" ] || fail "Could not determine the active pane's directory."
+command -v "$bin" >/dev/null 2>&1 || fail "Herdr executable not found. Reload Herdr config and try again."
+command -v git >/dev/null 2>&1 || fail "Git is not available in the popup's PATH."
+repo=$(git -C "$cwd" rev-parse --show-toplevel) || fail "The active pane is not in a Git checkout."
+
+printf 'New branch from origin/main (Enter cancels): '
+IFS= read -r branch || exit 0
+[ -n "$branch" ] || exit 0
+case "$branch" in -*) fail "Invalid branch name: $branch" ;; esac
+git check-ref-format "refs/heads/$branch" >/dev/null 2>&1 || fail "Invalid branch name: $branch"
+if git -C "$repo" show-ref --verify --quiet "refs/heads/$branch"; then
+  fail "Branch '$branch' already exists. Choose a new name to start from origin/main, or use Open worktree."
+fi
+
+# Explicitly update the tracking ref even when origin has a narrow fetch refspec.
+printf 'Fetching origin/main...\n'
+git -C "$repo" fetch --no-tags origin '+refs/heads/main:refs/remotes/origin/main' || fail "Fetch failed. No worktree was created; check the Git error above."
+base=$(git -C "$repo" rev-parse --verify 'refs/remotes/origin/main^{commit}') || fail "Could not resolve the fetched origin/main commit."
+
+# Pin the fetched commit and use the same checkout for fetching and creation.
+if "$bin" worktree create --cwd "$repo" --branch "$branch" --base "$base" --focus; then
+  exit 0
+fi
+fail "Worktree creation failed. Check the Herdr error above."
+'''
+
+# prefix+K. Close the workspace, and remove the checkout when it is a linked worktree.
+# A dirty checkout is left open; git worktree remove never deletes the branch.
+[[keys.command]]
+key = "prefix+shift+k"
+type = "shell"
+description = "close workspace and remove worktree"
+command = '''
+bin="${HERDR_BIN_PATH:-herdr}"
+ws="${HERDR_ACTIVE_WORKSPACE_ID:-}"
+[ -n "$ws" ] || exit 1
+
+notify() {
+  "$bin" notification show "$1" --body "$2" >/dev/null 2>&1 || true
+}
+
+info=$("$bin" workspace get "$ws" 2>/dev/null) || {
+  notify "Could not close workspace" "Herdr did not return the active workspace."
+  exit 1
+}
+
+linked=$(printf '%s' "$info" | python3 -c 'import json,sys
+try:
+    workspace=json.load(sys.stdin)["result"]["workspace"]
+except Exception:
+    print("bad")
+    raise SystemExit
+worktree=workspace.get("worktree") or {}
+print("yes" if worktree.get("is_linked_worktree") else "no")')
+
+case "$linked" in
+  yes|no) ;;
+  *)
+    notify "Could not close workspace" "Herdr returned invalid workspace metadata."
+    exit 1
+    ;;
+esac
+
+if [ "$linked" = "yes" ]; then
+  if err=$("$bin" worktree remove --workspace "$ws" 2>&1 >/dev/null); then
+    exit 0
+  fi
+  case "$err" in
+    *dirty_worktree_requires_force*)
+      notify "Worktree has local changes" "Prefix+K left this workspace open. Delete the checkout from the workspace menu to discard those changes."
+      exit 1
+      ;;
+    *not_linked_worktree*)
+      ;;
+    *)
+      notify "Could not remove worktree" "Prefix+K left this workspace open."
+      exit 1
+      ;;
+  esac
+fi
+
+if err=$("$bin" workspace close "$ws" 2>&1 >/dev/null); then
+  exit 0
+fi
+case "$err" in
+  *workspace_group_close_required*)
+    if "$bin" workspace close "$ws" --group >/dev/null 2>&1; then
+      exit 0
+    fi
+    notify "Could not close workspace" "Closing this worktree group failed."
+    exit 1
+    ;;
+esac
+notify "Could not close workspace" "Prefix+K left this workspace open."
+exit 1
+'''
+
+[ui]
+accent = "blue"
+
+# tmux drew single-line dividers between adjacent panes and no outer frame
+pane_gaps = false
+pane_outer_borders = false
+
+# tmux had no scrollbar column beside its panes
+pane_scrollbars = false
+
+# kill-window and kill-session never asked
+confirm_close = false
+
+# automatic-rename gave windows a name without prompting
+prompt_new_tab_name = false
+
+# set -g mouse on
+mouse_capture = true
+
+# status-right had the zoom flag followed by #h
+tab_bar_right = [{ type = "zoom" }, { type = "hostname" }]
+
+# set -g set-titles on / set -g set-titles-string '#h:#W', where tmux's #W was
+# the basename of the pane cwd. This is what Hyprland shows in the group bar,
+# and it resolves on the server so remote sessions name the remote host.
+window_title = "{hostname}: {workspace}"
+
+agent_panel_sort = "priority"
+status_indicators = "symbols"
+[ui.toast]
+delivery = "system"

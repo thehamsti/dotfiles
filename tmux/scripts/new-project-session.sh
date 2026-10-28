@@ -47,10 +47,10 @@ if [[ -z "${dir:-}" ]]; then
   exit 0
 fi
 
-name="$(basename "$dir" | tr " :/" "___")"
+name="$(basename "$dir" | tr " :/." "____")"
 
-if tmux has-session -t "$name" 2>/dev/null; then
-  tmux switch-client -t "$name"
+if tmux has-session -t "=$name" 2>/dev/null; then
+  tmux switch-client -t "=$name"
   exit 0
 fi
 
