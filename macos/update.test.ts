@@ -89,50 +89,28 @@ test("authenticates once, uses explicit yes flags, and does not invoke Nix", () 
   expect(result.calls).not.toContain("nix");
 });
 
-test("Homebrew updates mise before installing complete plugins and upgrading tools", () => {
+test("Homebrew updates mise before plugins and tools", () => {
   const result = fixture().run(["--no-system"]);
   expect(result.status).toBe(0);
   const brew = result.calls.indexOf("brew <upgrade> <--formula> <--yes>");
-  const install = result.calls.indexOf(
-    "mise <plugins> <install> <vfox:gcloud> <https://github.com/jdx/vfox-gcloud.git>",
-  );
   const plugins = result.calls.indexOf("mise <plugins> <update>");
   const upgrade = result.calls.indexOf("mise <upgrade> <--global> <--yes>");
   const shims = result.calls.indexOf("mise <reshim>");
-  expect(install).toBeGreaterThan(brew);
-  expect(plugins).toBeGreaterThan(install);
+  expect(plugins).toBeGreaterThan(brew);
   expect(upgrade).toBeGreaterThan(plugins);
   expect(shims).toBeGreaterThan(upgrade);
+  expect(result.calls).not.toContain("vfox:gcloud");
 });
 
-test("an installed filesystem gcloud plugin is updated without reinstall warnings", () => {
+test("failed plugin update prevents tool upgrades and shim regeneration", () => {
   const state = fixture();
-  const plugin = join(state.home, ".local/share/mise/plugins/gcloud");
-  mkdirSync(plugin, { recursive: true });
-  writeFileSync(join(plugin, "metadata.lua"), "PLUGIN = {}\n");
-  const result = state.run(["--no-system"]);
-  expect(result.status).toBe(0);
-  expect(result.calls).not.toContain("mise <plugins> <install>");
-  expect(result.calls).toContain("mise <plugins> <update>");
-  expect(result.calls).toContain("mise <upgrade> <--global> <--yes>");
+  state.withGlobals();
+  const result = state.run(["--no-system"], { FAIL_COMMAND: "mise plugins update" });
+  expect(result.status).toBe(1);
+  expect(result.calls).not.toContain("mise <upgrade>");
+  expect(result.calls).not.toContain("mise <reshim>");
+  expect(result.output).toContain("Upgrade Bun global packages");
 });
-
-test.each([
-  "mise plugins install vfox:gcloud https://github.com/jdx/vfox-gcloud.git",
-  "mise plugins update",
-])(
-  "a failed plugin preparation step prevents tool upgrades and shim regeneration: %s",
-  (command) => {
-    const state = fixture();
-    state.withGlobals();
-    const result = state.run(["--no-system"], { FAIL_COMMAND: command });
-    expect(result.status).toBe(1);
-    expect(result.calls).not.toContain("mise <upgrade>");
-    expect(result.calls).not.toContain("mise <reshim>");
-    expect(result.calls).toContain("brew <upgrade> <--cask> <--yes>");
-    expect(result.output).toContain("Upgrade Bun global packages");
-  },
-);
 
 function migrationFixture() {
   const state = fixture();
@@ -165,17 +143,6 @@ test("migration checks replacements without uninstalling by default", () => {
   expect(result.calls).toContain("mise <which> <--tool> <act> <act>");
   expect(result.calls).toContain("mise <exec> <act>");
   expect(result.calls).not.toContain("brew <uninstall>");
-});
-
-test("fresh mise setup prepares the full gcloud plugin before installing tools", () => {
-  const result = migrationFixture().runMigration();
-  expect(result.status).toBe(0);
-  const plugin = result.calls.indexOf(
-    "mise <plugins> <install> <vfox:gcloud> <https://github.com/jdx/vfox-gcloud.git>",
-  );
-  const install = result.calls.indexOf("<install> <--yes>");
-  expect(plugin).toBeGreaterThanOrEqual(0);
-  expect(install).toBeGreaterThan(plugin);
 });
 
 test("a failed replacement prevents all Homebrew removal", () => {
@@ -339,6 +306,7 @@ test("each migration maps to a configured tool and preserves runtime ranges", as
     expect(executable).toBeTruthy();
     expect(probe).toBeTruthy();
   }
+  expect(config.tools.gcloud).toBeUndefined();
   expect(config.tools.node).toBe("lts");
   expect(config.tools.dotnet).toEqual(["10", "8"]);
   expect(config.tools.terraform).toBe("1.5");

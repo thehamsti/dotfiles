@@ -275,11 +275,8 @@ Nix rebuild. It updates global mise tools without changing project version pins
 and preserves runtime release ranges. Homebrew updates mise itself.
 
 Homebrew runs first so mise itself is current before plugin/tool upgrades.
-Setup and updates install the complete gcloud plugin from its upstream Git
-repository, which includes the Python-discovery helper omitted from mise's
-embedded copy in the affected release. Plugin updates finish before tool
-upgrades and shim regeneration; failures are reported instead of continuing
-with a broken plugin.
+Plugin updates finish before tool upgrades and shim regeneration; failures are
+reported instead of continuing with stale plugin definitions.
 
 The suggestion to run `mise outdated --bump` is informational: newer releases
 outside a configured version range are available. The normal `update` command

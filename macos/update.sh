@@ -101,10 +101,7 @@ fi
 
 # Homebrew updates mise itself before the new plugin code is loaded.
 if command -v mise >/dev/null 2>&1; then
-    # The embedded gcloud plugin can omit its Python-discovery Lua helper.
-    gcloud_plugin="${MISE_DATA_DIR:-${XDG_DATA_HOME:-$HOME/.local/share}/mise}/plugins/gcloud/metadata.lua"
-    if { [[ -f "$gcloud_plugin" ]] || run_step "Prepare complete gcloud plugin" mise plugins install vfox:gcloud https://github.com/jdx/vfox-gcloud.git; } &&
-        run_step "Refresh mise plugin definitions" mise plugins update; then
+    if run_step "Refresh mise plugin definitions" mise plugins update; then
         run_step "Upgrade global mise tools" mise upgrade --global --yes
         run_step "Refresh mise shims" mise reshim
     fi

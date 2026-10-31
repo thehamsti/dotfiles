@@ -71,6 +71,5 @@ formula	yq	yq	yq	--version
 formula	yt-dlp	yt-dlp	yt-dlp	--version
 formula	zoxide	zoxide	zoxide	--version
 cask	1password-cli	1password-cli	op	--version
-cask	gcloud-cli	gcloud	gcloud	--version
 cask	goplaces	github:openclaw/goplaces	goplaces	--version
 cask	xurl	github:xdevplatform/xurl	xurl	--version

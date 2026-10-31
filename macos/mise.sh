@@ -21,10 +21,6 @@ else
 fi
 
 mise trust --yes "$DOTFILES_DIR/mise.toml"
-# The full plugin includes helpers missing from mise's embedded gcloud copy.
-if [[ ! -f "${MISE_DATA_DIR:-${XDG_DATA_HOME:-$HOME/.local/share}/mise}/plugins/gcloud/metadata.lua" ]]; then
-    mise plugins install vfox:gcloud https://github.com/jdx/vfox-gcloud.git
-fi
 mise -C "$DOTFILES_DIR" install --yes
 mise reshim
 bash "$DOTFILES_DIR/macos/git_credentials.sh"
