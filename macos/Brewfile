@@ -2,9 +2,6 @@
 # Homebrew retains native libraries, services, system tools, and desktop apps.
 # See homebrew-review.md for the installed-package audit and exceptions.
 
-tap "ubuntu/microk8s"
-tap "teamookla/speedtest"
-
 # Bootstrap and system utilities
 brew "mise"
 brew "bash"
@@ -19,7 +16,6 @@ brew "flock"
 brew "multitime"
 brew "nmap"
 brew "sshpass"
-brew "teamookla/speedtest/speedtest"
 brew "terminal-notifier"
 
 # Native development tools and libraries
@@ -46,7 +42,6 @@ brew "rbenv-gemset"
 brew "wireguard-tools"
 brew "wireguard-go"
 brew "freerdp"
-brew "ubuntu/microk8s/microk8s"
 brew "mysql-client"
 brew "postgresql@17"
 brew "postgresql@18"
@@ -60,27 +55,15 @@ brew "gdrive"
 brew "livekit"
 brew "portaudio"
 brew "espeak-ng"
-brew "ollama"
 
 # Desktop apps (including previously configured apps not currently installed)
 cask "ghostty"
-cask "wezterm"
 cask "zed"
-cask "sublime-text"
 cask "orbstack"
-cask "bruno"
-cask "multipass"
 cask "raycast"
-cask "rectangle"
-cask "jordanbaird-ice"
 cask "caffeine"
 cask "dropbox"
-cask "nextcloud"
 cask "stats"
 cask "flux-app"
 cask "codexbar"
-cask "superduper"
 cask "vlc"
-cask "transmission"
-cask "mactex"
-cask "zotero"
