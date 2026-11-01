@@ -36,10 +36,6 @@
       "mysql-client"
       "planetscale/tap/pscale"
 
-      # Ruby
-      "rbenv-default-gems"
-      "rbenv-gemset"
-
       # iOS Development
       "cocoapods"
 

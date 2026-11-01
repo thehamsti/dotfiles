@@ -206,8 +206,7 @@ Completion security checks remain enabled. The unused default Oh My Zsh theme
 is disabled when Starship is configured, and repeated Bun installer blocks are
 collapsed into one.
 
-Mise selects Node normally. NVM stays available through `nvm`, which loads it and
-its completions on first use without automatically switching Node. Codex's native
+Mise selects Node. Codex's native
 completions are generated on the first Tab press for Codex in each shell instead
 of during startup. The first completion may therefore take slightly longer.
 

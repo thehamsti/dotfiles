@@ -6,7 +6,6 @@ import {
   readFileSync,
   readdirSync,
   realpathSync,
-  renameSync,
   rmSync,
   statSync,
   symlinkSync,
@@ -33,14 +32,7 @@ function fixture() {
   mkdirSync(join(home, "dotfiles/macos"), { recursive: true });
   writeFileSync(join(home, "dotfiles/macos/aliases.sh"), "alias fixture_alias='print fixture'\n");
   mkdirSync(join(home, ".nvm"));
-  writeFileSync(
-    join(home, ".nvm/nvm.sh"),
-    `
-printf '%s\\n' "$*" >> "$HOME/nvm-loaded"
-nvm() { print -r -- "nvm:$*"; return 7; }
-`,
-  );
-  writeFileSync(join(home, ".nvm/bash_completion"), 'touch "$HOME/nvm-completion-loaded"\n');
+  writeFileSync(join(home, ".nvm/nvm.sh"), "nvm() { :; }\n");
   writeFileSync(
     join(home, ".oh-my-zsh/oh-my-zsh.sh"),
     `
@@ -117,30 +109,19 @@ EOF
   };
 }
 
-test("startup uses mise's Node and defers NVM and Codex generation", () => {
+test("startup uses mise's Node and defers Codex generation", () => {
   const state = fixture();
   expect(state.setup().status).toBe(0);
   const result = state.shell('node; print -r -- "$FIXTURE_CUSTOM_VALUE"; fixture_alias');
   expect(result.status).toBe(0);
   expect(result.error).toBe("");
   expect(result.output).toBe("mise-node\npreserved value\nfixture\n");
-  expect(existsSync(join(state.home, "nvm-loaded"))).toBe(false);
+  expect(readFileSync(join(state.home, ".zshrc"), "utf8")).not.toContain("NVM_DIR");
   expect(existsSync(join(state.home, "codex-loaded"))).toBe(false);
   expect(readFileSync(join(state.home, "completion-init"), "utf8")).toBe(
     `:${state.home}/.docker/completions\n`,
   );
-});
-
-test("explicit NVM use loads it once without auto-selecting Node and preserves its status", () => {
-  const state = fixture();
-  expect(state.setup().status).toBe(0);
-  const result = state.shell(
-    'nvm use "version with spaces"; print -r -- "status=$?"; nvm current; print -r -- "status=$?"',
-  );
-  expect(result.error).toBe("");
-  expect(result.output).toBe("nvm:use version with spaces\nstatus=7\nnvm:current\nstatus=7\n");
-  expect(readFileSync(join(state.home, "nvm-loaded"), "utf8")).toBe("--no-use\n");
-  expect(existsSync(join(state.home, "nvm-completion-loaded"))).toBe(true);
+  expect(state.shell("(( $+functions[nvm] ))").status).toBe(1);
 });
 
 test("Codex completion generates on first use and then uses the native completer", () => {
@@ -152,24 +133,6 @@ test("Codex completion generates on first use and then uses the native completer
   expect(result.error).toBe("");
   expect(result.output).toBe("completed:first two words\nstatus=7\ncompleted:again\nstatus=7\n");
   expect(readFileSync(join(state.home, "codex-loaded"), "utf8")).toBe("completion\n");
-});
-
-test("lazy NVM honors a custom NVM_DIR declared in .zshrc", () => {
-  const state = fixture();
-  renameSync(join(state.home, ".nvm"), join(state.home, "custom nvm"));
-  const profile = join(state.home, ".zshrc");
-  writeFileSync(
-    profile,
-    readFileSync(profile, "utf8").replace(
-      'export NVM_DIR="$HOME/.nvm"',
-      'export NVM_DIR="$HOME/custom nvm"',
-    ),
-  );
-  expect(state.setup().status).toBe(0);
-  const result = state.shell('nvm current; print -r -- "status=$?"');
-  expect(result.error).toBe("");
-  expect(result.output).toBe("nvm:current\nstatus=7\n");
-  expect(readFileSync(join(state.home, "nvm-loaded"), "utf8")).toBe("--no-use\n");
 });
 
 test("invalid Zsh syntax cannot replace the working profile", () => {

@@ -32,12 +32,6 @@ brew "gdbm"
 brew "libev"
 brew "mvfst"
 
-# Existing rbenv plugins remain available for legacy project gemsets.
-# New/default Ruby and Ruby CLIs are managed by mise.
-brew "rbenv"
-brew "rbenv-default-gems"
-brew "rbenv-gemset"
-
 # Networking and database services/headers
 brew "wireguard-tools"
 brew "wireguard-go"

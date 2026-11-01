@@ -9,6 +9,7 @@ export function configureZsh(content: string, directory: string): string {
   const startup = `source ${quote(join(directory, "zsh_startup.zsh"))}`;
   const completions = `source ${quote(join(directory, "zsh_completions.zsh"))}`;
   let result = content;
+  result = result.replace(/^export NVM_DIR="\$HOME\/\.nvm"$/gm, "");
   result = result.replace(/^\[ -s "\$NVM_DIR\/(?:nvm\.sh|bash_completion)" \] &&.*$/gm, "");
   result = result.replace(/^eval "\$\(codex completion zsh\)"$/gm, "");
   result = result.replace(
