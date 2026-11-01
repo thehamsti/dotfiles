@@ -181,6 +181,22 @@ test("generated Zsh initialization evaluates hook output without literal quote c
   expect(loaded.stderr.toString()).toBe("");
 });
 
+test("mise setup repairs its obsolete config link and preserves unrelated configs", () => {
+  const state = fixture();
+  state.fake("mise", "exit 0");
+  state.fake("git", "exit 1");
+  const config = join(state.home, ".config/mise/config.toml");
+  mkdirSync(join(state.home, ".config/mise"), { recursive: true });
+  symlinkSync(join(root, "nix/mise/config.toml"), config);
+  expect(state.run(join(root, "macos/mise.sh")).status).toBe(0);
+  expect(realpathSync(config)).toBe(join(root, "mise.toml"));
+  expect(state.run(join(root, "macos/mise.sh")).status).toBe(0);
+  rmSync(config);
+  writeFileSync(config, "custom config\n");
+  expect(state.run(join(root, "macos/mise.sh")).status).toBe(1);
+  expect(readFileSync(config, "utf8")).toBe("custom config\n");
+});
+
 test("macOS defaults keep quarantine protection and leave working applications open", () => {
   const state = fixture();
   const record = 'printf "%s %s\\n" "${0##*/}" "$*" >> "$CALL_LOG"';

@@ -65,6 +65,8 @@ export PATH="$BUN_INSTALL/bin:$PATH"
 export BUN_INSTALL="$HOME/.bun"
 export PATH="$BUN_INSTALL/bin:$PATH"
 export FIXTURE_CUSTOM_VALUE='preserved value'
+# Keep mise after other PATH additions so project versions take precedence.
+source "$HOME/dotfiles/nix/mise/activate.zsh"
 `,
   );
   for (const name of ["mise", "fzf", "zoxide", "starship", "direnv", "node"]) {
@@ -108,6 +110,16 @@ EOF
     },
   };
 }
+
+test("setup removes the obsolete mise activation source and remains repeatable", () => {
+  const state = fixture();
+  expect(state.setup().status).toBe(0);
+  expect(state.setup().status).toBe(0);
+  const profile = readFileSync(join(state.home, ".zshrc"), "utf8");
+  expect(profile).not.toContain("nix/mise/activate.zsh");
+  expect(profile.match(/mise activate zsh/g)).toHaveLength(1);
+  expect(state.shell().error).toBe("");
+});
 
 test("startup uses mise's Node and defers Codex generation", () => {
   const state = fixture();

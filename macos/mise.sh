@@ -11,6 +11,9 @@ if ! command -v mise >/dev/null 2>&1; then
 fi
 
 mkdir -p "$CONFIG_DIR"
+if [[ -L "$CONFIG" && ! -e "$CONFIG" && "$(readlink "$CONFIG")" == "$DOTFILES_DIR/nix/mise/config.toml" ]]; then
+    rm "$CONFIG"
+fi
 if [[ -e "$CONFIG" || -L "$CONFIG" ]]; then
     if [[ ! "$CONFIG" -ef "$DOTFILES_DIR/mise.toml" ]]; then
         echo "Existing mise config at $CONFIG; merge it with $DOTFILES_DIR/mise.toml first." >&2
